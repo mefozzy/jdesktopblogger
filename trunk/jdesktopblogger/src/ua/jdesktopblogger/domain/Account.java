@@ -7,7 +7,7 @@ import java.util.Set;
  * Represents a single account that is stored on the
  * user machine. Account holds auth information and collection of blogs.
  * 
- * @author Yuriy Tkach
+ * @author Yuriy Tkach  
  */
 public class Account {
 
