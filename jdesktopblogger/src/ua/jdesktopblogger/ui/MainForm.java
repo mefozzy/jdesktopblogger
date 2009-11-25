@@ -39,6 +39,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import ua.cn.yet.common.ui.popup.PopupFactory;
 import ua.cn.yet.common.ui.popup.PopupListener;
 import ua.jdesktopblogger.Messages;
+import ua.jdesktopblogger.ui.actions.AccountEditAction;
 
 public class MainForm {
 
@@ -73,12 +74,13 @@ public class MainForm {
 
 	private JLabel labelStatusBar;
 
-	////////////////////////////////////////////////////////////////////////////////////
-
-
 	private JLabel labelLoading;
 
 	private TrayIcon trayIcon;
+	
+	////////////////////////////////////////////////////////////////////////////////////
+
+	private AccountEditAction accountEditAction;
 
 	/**
 	 * Create the class and frame
@@ -290,7 +292,7 @@ public class MainForm {
 //
 //		accountEmailRetrieveAction = new AccountEmailRetrieveAction(this);
 //		accountAddAction = new AccountAddAction(this);
-//		accountEditAction = new AccountEditAction(this);
+		accountEditAction = new AccountEditAction(this);
 //		accountDelAction = new AccountDeleteAction(this);
 //
 //		emailCheckAllAction = new EmailCheckAllAction(this);
@@ -357,7 +359,25 @@ public class MainForm {
 	
 		contentPane.add(createStatusBar(), BorderLayout.SOUTH);
 		
-		//createToolBar(contentPane);
+		createToolBar(contentPane);
+	}
+	
+	/**
+	 * Creating toolbar
+	 * 
+	 * @param contentPane
+	 */
+	private void createToolBar(Container contentPane) {
+		JButton button;
+
+		toolBar = new JToolBar();
+		toolBar.setAutoscrolls(true);
+		toolBar.setFloatable(true);
+		contentPane.add(toolBar, BorderLayout.NORTH);
+
+		button = new JButton(accountEditAction);
+		button.setText(null);
+		toolBar.add(button);
 	}
 
 
