@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import ua.cn.yet.common.ui.Utf8ResourceBundle;
 
 public class Messages {
-	private static final String BUNDLE_NAME = "ua.cn.yet.emailChecker.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "ua.jdesktopblogger.messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle UTF_RESOURCE_BUNDLE = Utf8ResourceBundle.
 			getBundle(BUNDLE_NAME);
