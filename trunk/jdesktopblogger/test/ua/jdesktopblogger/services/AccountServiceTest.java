@@ -1,73 +1,86 @@
 package ua.jdesktopblogger.services;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import javax.xml.bind.JAXBException;
+import java.io.File;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ua.jdesktopblogger.domain.Account;
-import junit.framework.TestCase;
+import ua.jdesktopblogger.excetions.AccountIOException;
 
 /**
  * @author Alex Skosyr
- *
+ * 
  */
-public class AccountServiceTest extends TestCase {
+public class AccountServiceTest {
 
 	private Account account;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		account = new Account();
 		account.setLogin("login");
 		account.setName("name");
 		account.setPassword("password");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		account = null;
 	}
 
-	public void testAccountMarshall(){
-		IAccountService accountService = ServiceFactory.getDefaultFactory().getAccountService();
+	@Test
+	public void testAccountMarshall() {
+		IAccountService accountService = ServiceFactory.getDefaultFactory()
+				.getAccountService();
 		try {
 			accountService.saveAccount(account);
-			
+
 			StringBuffer sb = new StringBuffer();
-			sb.append(System.getProperty("user.home")).append("/").append(account.getLogin()).append(".xml");
+			sb.append(System.getProperty("user.home")).append(
+					System.getProperty("file.separator")).append(
+					".jdesktopblogger").append(
+					System.getProperty("file.separator")).append(
+					account.getLogin()).append(".xml");
 			File file = new File(sb.toString());
-			if (file.exists() && file.getFreeSpace() > 0){
+			if (file.exists() && file.getFreeSpace() > 0) {
 				// do nothing
 			} else {
 				fail("Error during file creation");
 			}
-		} catch (FileNotFoundException e) {
+		} catch (AccountIOException e) {
 			e.printStackTrace();
-			fail("Error during file creation:" + e.getMessage());
-		} catch (JAXBException e) {
-			e.printStackTrace();
-			fail("Error during marshalling:" + e.getMessage());
+			fail("Error:" + e.getMessage());
 		}
 	}
 
-	public void testAccountUnMarshall(){
-		IAccountService accountService = ServiceFactory.getDefaultFactory().getAccountService();
+	@Test
+	public void testAccountUnMarshall() {
+		IAccountService accountService = ServiceFactory.getDefaultFactory()
+				.getAccountService();
 		Account account;
 		try {
 			account = accountService.getLoadedAccount("login");
-			assertNotNull(account);			
+			assertNotNull(account);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Error during document unmarshalling" + e.getMessage());
 		}
-			
+
 	}
-	
+
 }
