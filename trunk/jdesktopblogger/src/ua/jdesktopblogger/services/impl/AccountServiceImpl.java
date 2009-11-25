@@ -69,7 +69,7 @@ public class AccountServiceImpl implements IAccountService {
 				StringBuffer sb = buildSettingsDir();
 
 				File dir = new File(sb.toString());
-				if (dir.mkdirs()) {
+				if ((dir.exists()) || (dir.mkdirs())) {
 
 					sb.append(account.getLogin()).append(".xml");
 					marshaller.marshal(account, new FileOutputStream(sb
