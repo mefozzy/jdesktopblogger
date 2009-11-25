@@ -20,6 +20,11 @@ import javax.swing.border.EmptyBorder;
 
 import ua.cn.yet.common.ui.popup.PopupFactory;
 import ua.cn.yet.common.ui.popup.PopupListener;
+import ua.jdesktopblogger.Messages;
+import ua.jdesktopblogger.domain.Account;
+import ua.jdesktopblogger.domain.IAccountListener;
+import ua.jdesktopblogger.excetions.AccountIOException;
+import ua.jdesktopblogger.services.ServiceFactory;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -38,11 +43,16 @@ public class AccountDialog extends JDialog {
 
 	private JButton cancelButton;
 
+	private IAccountListener accountListener;
+
 	/**
 	 * Create the dialog.
 	 */
-	public AccountDialog(JFrame owner) {
+	public AccountDialog(JFrame owner, IAccountListener accountListener) {
 		super(owner);
+		
+		this.accountListener = accountListener;
+		
 		setModal(true);
 		setResizable(false);
 		setTitle("Account information");
@@ -142,9 +152,25 @@ public class AccountDialog extends JDialog {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		
+		Account ac = new Account();
+		ac.setLogin(textField.getText());
+		ac.setPassword(String.valueOf(passwordField.getPassword()));
+		
+		try {
+			ServiceFactory.getDefaultFactory().getAccountService().saveAccount(ac);
+		} catch (AccountIOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this,
+					"There was an error when saving account file. "+
+					Messages.NEW_LINE_DOUBLE+
+					e.getLocalizedMessage(), this.getTitle(),
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		accountListener.accountCreated(ac);
 
-		// TODO: Add account saving code
-		JOptionPane.showMessageDialog(this, "Save account action");
 		dispose();
 	}
 
