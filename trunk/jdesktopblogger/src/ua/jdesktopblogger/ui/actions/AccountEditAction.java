@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+import ua.jdesktopblogger.ui.AccountDialog;
 import ua.jdesktopblogger.ui.MainForm;
 
 @SuppressWarnings("serial") //$NON-NLS-1$
@@ -17,8 +18,6 @@ public class AccountEditAction extends SuperAction {
 				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
 						ActionEvent.ALT_MASK),
 				"Edit account information, such as login and password", fr);
-
-		this.setEnabled(false);
 	}
 
 	public AccountEditAction(String caption, ImageIcon icon, int keyEvent,
@@ -27,7 +26,7 @@ public class AccountEditAction extends SuperAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		
+		new AccountDialog(form.getFrame()).setVisible(true);
 	}
 
 }
