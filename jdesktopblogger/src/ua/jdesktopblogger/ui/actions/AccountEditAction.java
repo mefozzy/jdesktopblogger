@@ -26,7 +26,7 @@ public class AccountEditAction extends SuperAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		new AccountDialog(form.getFrame()).setVisible(true);
+		new AccountDialog(form.getFrame(), form).setVisible(true);
 	}
 
 }
