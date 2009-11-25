@@ -18,12 +18,22 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name="account", propOrder= { "name", "login", "password" } )
+@XmlType(name="account", propOrder= { "id", "login", "password" } )
 public class Account {
 
 	/** Name of the account */
 	@XmlElement(required=true)
-	private String name;
+	private String id;
+	
+	/** 
+	 * Blog provider access object that is used by blog provider
+	 * to store its connection or some other needed information.
+	 * For every method call of blog provider the account object
+	 * is passed, so blog provider can store and then access
+	 * some information in this object. 
+	 */
+	@XmlTransient
+	private Object providerObject;
 	
 	/** User login */
 	@XmlElement(required=true)
@@ -38,17 +48,17 @@ public class Account {
 	private Set<Blog> blogs;
 
 	/**
-	 * @return the name
+	 * @return the id
 	 */
-	public String getName() {
-		return name;
+	public String getId() {
+		return id;
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param id the id to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/**
@@ -91,6 +101,20 @@ public class Account {
 	 */
 	public void setBlogs(Set<Blog> blogs) {
 		this.blogs = blogs;
+	}
+
+	/**
+	 * @return the providerObject
+	 */
+	public Object getProviderObject() {
+		return providerObject;
+	}
+
+	/**
+	 * @param providerObject the providerObject to set
+	 */
+	public void setProviderObject(Object providerObject) {
+		this.providerObject = providerObject;
 	}
 
 }
