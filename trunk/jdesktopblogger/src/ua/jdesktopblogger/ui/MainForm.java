@@ -39,9 +39,11 @@ import javax.swing.UnsupportedLookAndFeelException;
 import ua.cn.yet.common.ui.popup.PopupFactory;
 import ua.cn.yet.common.ui.popup.PopupListener;
 import ua.jdesktopblogger.Messages;
+import ua.jdesktopblogger.domain.Account;
+import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 
-public class MainForm {
+public class MainForm implements IAccountListener {
 
 	// Specify the look and feel to use. Valid values:
 	// null (use the default), "Metal", "System", "Motif", "GTK+"
@@ -536,6 +538,25 @@ public class MainForm {
 	 */
 	public JTable getTableEmails() {
 		return tableEmails;
+	}
+
+
+	@Override
+	public void accountCreated(Account account) {
+		System.out.println("Hello " + account);
+		
+	}
+
+	@Override
+	public void accountEdited(Account account) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void accountRefreshed(Account account) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
