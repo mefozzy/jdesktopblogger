@@ -561,11 +561,10 @@ public class MainForm implements IAccountListener {
 	public JTable getTableEmails() {
 		return tableEmails;
 	}
-
+	
 	@Override
 	public void accountCreated(Account account) {
-		System.out.println("Hello " + account + " account.name:" + account.getLogin() 
-				+ " account.passwd:" + account.getPassword());
+		System.out.println("Hello " + account);
 		blogsTreeModel.addAccount(account);
 		treeBlogs.updateUI();
 	}
