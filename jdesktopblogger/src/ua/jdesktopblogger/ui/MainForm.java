@@ -32,6 +32,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.JTree;
+import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -40,8 +42,10 @@ import ua.cn.yet.common.ui.popup.PopupFactory;
 import ua.cn.yet.common.ui.popup.PopupListener;
 import ua.jdesktopblogger.Messages;
 import ua.jdesktopblogger.domain.Account;
+import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
+import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
 
 public class MainForm implements IAccountListener {
 
@@ -79,6 +83,10 @@ public class MainForm implements IAccountListener {
 	private JLabel labelLoading;
 
 	private TrayIcon trayIcon;
+	
+	private JTree treeBlogs;
+	
+	private BlogsTreeDataModel blogsTreeModel; 
 	
 	////////////////////////////////////////////////////////////////////////////////////
 
@@ -354,8 +362,8 @@ public class MainForm implements IAccountListener {
 
 		createAccountsTree(scrollPane);
 		
-		scrollPane = new JScrollPane();
-		splitPaneLeftRight.setRightComponent(scrollPane);
+//		scrollPane = new JScrollPane();
+//		splitPaneLeftRight.setRightComponent(scrollPane);
 
 		//createMailsTable(scrollPane);
 	
@@ -439,7 +447,21 @@ public class MainForm implements IAccountListener {
 	 * @param scrollPane Pane to add components to
 	 */
 	private void createAccountsTree(JScrollPane scrollPane) {
-		// TODO Auto-generated method stub
+		blogsTreeModel = new BlogsTreeDataModel();
+		treeBlogs = new JTree(blogsTreeModel){
+			public String convertValueToText(Object value, boolean selected, boolean expanded,
+					boolean leaf, int row, boolean hasFocus){
+				if (value instanceof Account){
+					Account account = (Account) value;
+					return account.getLogin();
+				} else if (value instanceof Blog){
+					Blog blog = (Blog) value;
+					return blog.getName();
+				}
+				return "";
+			}
+		};
+		scrollPane.setViewportView(treeBlogs);
 		
 	}
 
@@ -540,16 +562,16 @@ public class MainForm implements IAccountListener {
 		return tableEmails;
 	}
 
-
 	@Override
 	public void accountCreated(Account account) {
-		System.out.println("Hello " + account);
-		
+		System.out.println("Hello " + account + " account.name:" + account.getLogin() 
+				+ " account.passwd:" + account.getPassword());
+		blogsTreeModel.addAccount(account);
+		treeBlogs.updateUI();
 	}
 
 	@Override
 	public void accountEdited(Account account) {
-		// TODO Auto-generated method stub
 		
 	}
 
