@@ -34,7 +34,9 @@ public class AccountServiceImpl implements IAccountService {
 			sb.append(login).append(".xml");
 			JAXBElement<Account> res = (JAXBElement<Account>) unmarshaller
 					.unmarshal(new FileInputStream(sb.toString()));
-			return res.getValue();
+			Account account = res.getValue();
+			account.decryptPasswd();
+			return account;
 
 		} catch (JAXBException e) {
 			throw new AccountIOException(e);
@@ -72,8 +74,12 @@ public class AccountServiceImpl implements IAccountService {
 				if ((dir.exists()) || (dir.mkdirs())) {
 
 					sb.append(account.getLogin()).append(".xml");
+					// encrypt data before storing
+					account.encryptPasswd();
 					marshaller.marshal(account, new FileOutputStream(sb
 							.toString()));
+					// decrypt data for application use
+					account.decryptPasswd();
 				} else {
 					throw new AccountIOException("Failed to create directory: "
 							+ sb.toString());
