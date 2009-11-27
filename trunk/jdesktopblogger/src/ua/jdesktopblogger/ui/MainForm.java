@@ -17,6 +17,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Calendar;
+import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -48,7 +49,8 @@ import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.domain.IPostListener;
-import ua.jdesktopblogger.domain.Post;
+import ua.jdesktopblogger.excetions.AccountIOException;
+import ua.jdesktopblogger.services.ServiceFactory;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
 import ua.jdesktopblogger.ui.actions.PostsLoadAction;
@@ -243,6 +245,17 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * Performing startup actions if they were specified in preferences
 	 */
 	private void startup() {
+		try {
+			Collection<Account> accounts = ServiceFactory.getDefaultFactory().getAccountService().loadSavedAccounts();
+			
+			for (Account account : accounts) {
+				accountCreated(account);
+			}
+			
+		} catch (AccountIOException e) {
+			e.printStackTrace();
+		}
+		
 		// if
 		// (ModelService.getInstance().getPreferencesWorker().isLoadLastFile())
 		// {
