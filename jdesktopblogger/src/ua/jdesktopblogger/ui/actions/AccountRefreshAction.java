@@ -7,9 +7,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.ui.MainForm;
 
-@SuppressWarnings("serial") //$NON-NLS-1$
+@SuppressWarnings("serial")//$NON-NLS-1$
 public class AccountRefreshAction extends SuperAction {
 
 	public AccountRefreshAction(MainForm fr) {
@@ -18,7 +19,7 @@ public class AccountRefreshAction extends SuperAction {
 				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
 						ActionEvent.ALT_MASK),
 				"Refresh list of blogs for account", fr);
-		
+
 		setEnabled(false);
 	}
 
@@ -28,7 +29,16 @@ public class AccountRefreshAction extends SuperAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		JOptionPane.showMessageDialog(form.getFrame(), "Refreshing");
+
+		Account account = form.getSelectedAccount();
+		if (account != null) {
+			JOptionPane.showMessageDialog(form.getFrame(), "Selected "
+					+ account.getLogin());
+		} else {
+			JOptionPane.showMessageDialog(form.getFrame(),
+					"Please, select an account for refreshing", form
+							.getAppTitle(), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 }
