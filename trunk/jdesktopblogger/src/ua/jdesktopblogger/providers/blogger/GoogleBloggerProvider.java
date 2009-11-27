@@ -189,7 +189,11 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			
 			post.setKeywords(entry.getEtag());
 			
-			//post.setUrl(entry.getHtmlLink().getHref());
+			if (entry.getHtmlLink() != null) {
+				post.setUrl(entry.getHtmlLink().getHref());
+			} else {
+				post.setUrl(entry.getEditLink().getHref());
+			}
 			
 			rez.add(post);
 		}
