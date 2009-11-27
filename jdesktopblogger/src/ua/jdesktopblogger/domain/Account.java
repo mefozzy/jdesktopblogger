@@ -24,7 +24,7 @@ import sun.misc.BASE64Encoder;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "account", propOrder = { "id", "login", "password" })
+@XmlType(name = "account", propOrder = { "login", "password" })
 public class Account {
 	
 	private static final String ALGORITHM = "AES";
