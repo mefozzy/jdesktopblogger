@@ -1,6 +1,7 @@
 package ua.jdesktopblogger.services;
 
 import ua.jdesktopblogger.domain.Account;
+import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.excetions.BlogServiceException;
 
 /**
@@ -15,9 +16,12 @@ public interface IBlogService {
 	 * 
 	 * @param account
 	 *            Account to refresh
+	 * @param accountListener
+	 *            Listener to the account events
 	 * @throws BlogServiceException
 	 *             If error occurs
 	 */
-	public void refreshAccount(Account account) throws BlogServiceException;
+	public void refreshAccount(Account account, IAccountListener accountListener)
+			throws BlogServiceException;
 
 }
