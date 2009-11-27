@@ -47,15 +47,18 @@ import ua.jdesktopblogger.Messages;
 import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
+import ua.jdesktopblogger.domain.IPostListener;
+import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
+import ua.jdesktopblogger.ui.actions.PostsLoadAction;
 import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
 import ua.jdesktopblogger.ui.renderers.DateRenderer;
 import ua.jdesktopblogger.ui.renderers.TreeCellAccountRenderer;
 import ua.jdesktopblogger.ui.tables.TablePostModel;
 import ua.jdesktopblogger.ui.tables.TableSorterWithoutZeroColumn;
 
-public class MainForm implements IAccountListener {
+public class MainForm implements IAccountListener, IPostListener {
 
 	// Specify the look and feel to use. Valid values:
 	// null (use the default), "Metal", "System", "Motif", "GTK+"
@@ -101,7 +104,9 @@ public class MainForm implements IAccountListener {
 	// //////////////////////////////////////////////////////////////////////////////////
 
 	private AccountEditAction accountEditAction;
-	private AccountRefreshAction accountRefreshAction;
+	private AccountRefreshAction accountRefreshAction;	
+	private PostsLoadAction postsLoadAction;
+
 
 	/**
 	 * Create the class and frame
@@ -319,24 +324,9 @@ public class MainForm implements IAccountListener {
 		//
 		accountEditAction = new AccountEditAction(this);
 		accountRefreshAction = new AccountRefreshAction(this);
-		//
-		// emailCheckAllAction = new EmailCheckAllAction(this);
-		// emailCheckAgainsMainAccount = new
-		// EmailCheckAgainstMainAccountAction(this);
-		// emailCheckAgainsMainAccountAll = new
-		// EmailCheckAgainstMainAccountActionAll(this);
-		// emailCheckCancelAction = new EmailCheckCancelAction(this);
-		// emailDeleteAccountEmailsAction = new
-		// EmailDeleteAccountEmailsAction(this, accountEmailRetrieveAction);
-		// emailDeleteAllEmailsButOneAction = new
-		// EmailDeleteAllEmailsButOneAction(this);
-		// emailDeleteAllEmailsAction = new EmailDeleteAllEmailsAction(this);
-		//		
-		// otherSettingsAction = new OtherSettingsAction(this);
-		// otherViewLogAction = new OtherViewLogAction(this);
-		//
-		// logSaveAsAction = new LogSaveAsAction(this);
-		//
+		
+		postsLoadAction = new PostsLoadAction(this);
+		
 		// helpAboutAction = new HelpAboutAction(this);
 	}
 
@@ -473,6 +463,10 @@ public class MainForm implements IAccountListener {
 		toolBar.add(button);
 
 		button = new JButton(accountRefreshAction);
+		button.setText(null);
+		toolBar.add(button);
+		
+		button = new JButton(postsLoadAction);
 		button.setText(null);
 		toolBar.add(button);
 	}
@@ -706,8 +700,31 @@ public class MainForm implements IAccountListener {
 		}
 	}
 
+	/**
+	 * Getting selected blog from the tree
+	 * 
+	 * @return Selected blog or <code>null</code>
+	 */
 	public Blog getSelectedBlog(){
-		return null;
+		TreePath path = treeBlogs.getSelectionPath();
+		if ((path != null) && (path.getPathCount()>2)) {
+			return (Blog) path.getPath()[2];
+		} else {
+			return null;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.domain.IPostListener#postsLoaded(ua.jdesktopblogger.domain.Blog)
+	 */
+	@Override
+	public void postsLoaded(Blog blog) {
+		tablePostModel.fireTableDataChanged();
+		
+		System.out.println("Posts loaded");		
+		for (Post post : blog.getPosts()) {
+			System.out.println(post.getTitle());
+		}
 	}
 	
 }
