@@ -684,6 +684,8 @@ public class MainForm implements IAccountListener, IPostListener {
 		System.out.println("Refreshed!");
 		
 		treeBlogs.updateUI();
+		
+		postsLoadAction.setEnabled(true);
 	}
 
 	/**
@@ -720,11 +722,6 @@ public class MainForm implements IAccountListener, IPostListener {
 	@Override
 	public void postsLoaded(Blog blog) {
 		tablePostModel.fireTableDataChanged();
-		
-		System.out.println("Posts loaded");		
-		for (Post post : blog.getPosts()) {
-			System.out.println(post.getTitle());
-		}
 	}
 	
 }
