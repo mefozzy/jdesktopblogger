@@ -11,7 +11,7 @@ import java.util.Calendar;
  * 
  * @author Yuriy Tkach
  */
-public class Post {
+public class Post implements Comparable<Post> {
 	
 	/** Post title */
 	private String title;
@@ -113,6 +113,15 @@ public class Post {
 	 */
 	public void setUploaded(boolean uploaded) {
 		this.uploaded = uploaded;
+	}
+
+	@Override
+	public int compareTo(Post o) {
+		int rez = -1;
+		if ((o != null) && (date != null)) {
+			rez = date.compareTo(o.getDate());
+		}
+		return rez;
 	}
 	
 }
