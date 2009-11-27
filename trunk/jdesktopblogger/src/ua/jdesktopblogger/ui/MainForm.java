@@ -697,4 +697,8 @@ public class MainForm implements IAccountListener {
 		}
 	}
 
+	public Blog getSelectedBlog(){
+		return null;
+	}
+	
 }
