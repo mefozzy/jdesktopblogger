@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 /**
  * Class that represents single blog post that 
- * implements {@link Comparable} and compares by date.
+ * implements {@link Comparable} and compares by publishDate.
  * 
  * Blog has indicator field that defines if it was uploaded to server.
  * All non-uploaded posts are saved on local machine.
@@ -22,8 +22,11 @@ public class Post implements Comparable<Post> {
 	/** Comma separated list of keywords */
 	private String keywords;
 	
-	/** Creation date */
-	private Calendar date;
+	/** Creation publishDate */
+	private Calendar publishDate;
+
+	/** Edit date */
+	private Calendar editDate;
 	
 	/** Specifies, if blog is a draft and not published yet */
 	private boolean draft;
@@ -74,20 +77,6 @@ public class Post implements Comparable<Post> {
 	}
 
 	/**
-	 * @return the date
-	 */
-	public Calendar getDate() {
-		return date;
-	}
-
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(Calendar date) {
-		this.date = date;
-	}
-
-	/**
 	 * @return the draft
 	 */
 	public boolean isDraft() {
@@ -118,10 +107,38 @@ public class Post implements Comparable<Post> {
 	@Override
 	public int compareTo(Post o) {
 		int rez = -1;
-		if ((o != null) && (date != null)) {
-			rez = date.compareTo(o.getDate());
+		if ((o != null) && (publishDate != null)) {
+			rez = publishDate.compareTo(o.getPublishDate());
 		}
 		return rez;
+	}
+
+	/**
+	 * @return the publishDate
+	 */
+	public Calendar getPublishDate() {
+		return publishDate;
+	}
+
+	/**
+	 * @param publishDate the publishDate to set
+	 */
+	public void setPublishDate(Calendar publishDate) {
+		this.publishDate = publishDate;
+	}
+
+	/**
+	 * @return the editDate
+	 */
+	public Calendar getEditDate() {
+		return editDate;
+	}
+
+	/**
+	 * @param editDate the editDate to set
+	 */
+	public void setEditDate(Calendar editDate) {
+		this.editDate = editDate;
 	}
 	
 }
