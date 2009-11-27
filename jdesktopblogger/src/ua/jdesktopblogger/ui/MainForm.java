@@ -49,6 +49,7 @@ import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
+import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
 import ua.jdesktopblogger.ui.renderers.DateRenderer;
 import ua.jdesktopblogger.ui.renderers.TreeCellAccountRenderer;
 import ua.jdesktopblogger.ui.tables.TablePostModel;
@@ -391,7 +392,7 @@ public class MainForm implements IAccountListener {
 	}
 
 	private void createBlogsTable(JScrollPane scrollPane) {
-		tablePostModel = new TablePostModel();
+		tablePostModel = new TablePostModel(this);
 		TableSorterWithoutZeroColumn sorter = 
 			new TableSorterWithoutZeroColumn(tablePostModel);
 		
