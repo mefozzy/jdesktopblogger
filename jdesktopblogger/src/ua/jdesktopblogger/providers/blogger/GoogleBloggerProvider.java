@@ -182,14 +182,14 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			post.setEditDate(Calendar.getInstance());
 			post.getEditDate().setTimeInMillis(entry.getEdited().getValue());
 			
-			post.setEditDate(Calendar.getInstance());
-			post.getEditDate().setTimeInMillis(entry.getPublished().getValue());
+			post.setPublishDate(Calendar.getInstance());
+			post.getPublishDate().setTimeInMillis(entry.getPublished().getValue());
 			
 			post.setDraft(entry.isDraft());
 			
 			post.setKeywords(entry.getEtag());
 			
-			post.setUrl(entry.getHtmlLink().getHref());
+			//post.setUrl(entry.getHtmlLink().getHref());
 			
 			rez.add(post);
 		}
