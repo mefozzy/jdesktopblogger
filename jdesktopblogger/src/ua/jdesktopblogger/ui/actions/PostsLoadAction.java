@@ -15,9 +15,9 @@ import ua.jdesktopblogger.services.ServiceFactory;
 import ua.jdesktopblogger.ui.MainForm;
 
 @SuppressWarnings("serial")//$NON-NLS-1$
-public class postsLoadAction extends SuperAction {
+public class PostsLoadAction extends SuperAction {
 
-	public postsLoadAction(MainForm fr) {
+	public PostsLoadAction(MainForm fr) {
 		this("Load posts", MainForm.createImageIcon("images/mail_get.png"), //$NON-NLS-1$
 				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
 						ActionEvent.ALT_MASK), "Load posts for the blog", fr);
@@ -25,7 +25,7 @@ public class postsLoadAction extends SuperAction {
 		setEnabled(false);
 	}
 
-	public postsLoadAction(String caption, ImageIcon icon, int keyEvent,
+	public PostsLoadAction(String caption, ImageIcon icon, int keyEvent,
 			KeyStroke keyStroke, String description, MainForm fr) {
 		super(caption, icon, keyEvent, keyStroke, description, fr);
 	}
