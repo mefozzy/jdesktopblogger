@@ -6,17 +6,17 @@ import java.net.URL;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.google.gdata.client.blogger.BloggerService;
-import com.google.gdata.data.Entry;
-import com.google.gdata.data.Feed;
-import com.google.gdata.util.AuthenticationException;
-import com.google.gdata.util.ServiceException;
-
 import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.excetions.AccountAuthenticateException;
 import ua.jdesktopblogger.excetions.BlogServiceException;
 import ua.jdesktopblogger.providers.IBlogProvider;
+
+import com.google.gdata.client.blogger.BloggerService;
+import com.google.gdata.data.Entry;
+import com.google.gdata.data.Feed;
+import com.google.gdata.util.AuthenticationException;
+import com.google.gdata.util.ServiceException;
 
 /**
  * Provider that works with
@@ -114,20 +114,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			throw new BlogServiceException(e);
 		}
 
-		account.setId(blogId);
 		account.setProviderObject(myService);
-		// feedUri = FEED_URI_BASE + "/" + blogId;
-	}
-
-	/**
-	 * Getting feed uri for accessing blogger feed
-	 * 
-	 * @param account
-	 *            Account object to get blog id from
-	 * @return Feed uri to access blogger feed
-	 */
-	private String getFeedUri(Account account) {
-		return FEED_URI_BASE + "/" + account.getId();
 	}
 
 	/**

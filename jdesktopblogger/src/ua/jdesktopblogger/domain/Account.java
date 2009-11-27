@@ -31,10 +31,6 @@ public class Account {
 	
     private static final byte[] keyValue = 
         new byte[] { 'T', 'h', 'i', 's', 'I', 's', 'A', 'S', 'e', 'c', 'r', 'e', 't', 'K', 'e', 'y' };
-
-	/** Name of the account */
-	@XmlElement(required = true)
-	private String id;
 	
 	@XmlTransient
 	private boolean encrypt = false;
@@ -60,20 +56,6 @@ public class Account {
 	@XmlTransient
 	private Set<Blog> blogs = new HashSet<Blog>();
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	/**
 	 * @return the login
