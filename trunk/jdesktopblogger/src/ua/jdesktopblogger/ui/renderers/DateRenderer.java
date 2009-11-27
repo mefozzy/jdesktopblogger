@@ -3,7 +3,6 @@ package ua.jdesktopblogger.ui.renderers;
 import java.awt.Component;
 import java.awt.Font;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import javax.swing.JLabel;
@@ -32,9 +31,10 @@ public class DateRenderer extends JLabel implements TableCellRenderer {
 		
 		setFont(new Font("", Font.PLAIN, 12)); //$NON-NLS-1$
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd MMM yyyy");
+		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+		
 		if (value != null){
-			setText(sdf.format(((Calendar)value).getTime()));
+			setText(df.format(((Calendar)value).getTime()));
 		}
 		
 		return this;
