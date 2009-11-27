@@ -627,7 +627,7 @@ public class MainForm implements IAccountListener {
 	public Account getSelectedAccount() {
 		TreePath path = treeBlogs.getSelectionPath();
 		if ((path != null) && (path.getPathCount()>1)) {
-			return (Account) path.getPath()[0];
+			return (Account) path.getPath()[1];
 		} else {
 			return null;
 		}
