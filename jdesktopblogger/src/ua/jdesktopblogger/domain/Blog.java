@@ -8,7 +8,7 @@ import java.util.SortedSet;
  *   
  * @author Yuriy Tkach
  */
-public class Blog {
+public class Blog implements Comparable<Blog>{
 	
 	/** Name of the blog */
 	private String name;
@@ -59,5 +59,15 @@ public class Blog {
 	 */
 	public void setPosts(SortedSet<Post> posts) {
 		this.posts = posts;
+	}
+
+	@Override
+	public int compareTo(Blog o) {
+		int rez = -1;
+		
+		if ((o != null) && (name != null)) {
+			rez = name.compareTo(o.getName());
+		}
+		return rez;
 	}
 }
