@@ -76,20 +76,20 @@ public class MainForm implements IAccountListener {
 	private JToolBar toolBar;
 
 	private JProgressBar progressBar;
-	
-	private JButton cancelButton; 
+
+	private JButton cancelButton;
 
 	private JLabel labelStatusBar;
 
 	private JLabel labelLoading;
 
 	private TrayIcon trayIcon;
-	
+
 	private JTree treeBlogs;
-	
-	private BlogsTreeDataModel blogsTreeModel; 
-	
-	////////////////////////////////////////////////////////////////////////////////////
+
+	private BlogsTreeDataModel treeModelBlogs;
+
+	// //////////////////////////////////////////////////////////////////////////////////
 
 	private AccountEditAction accountEditAction;
 	private AccountRefreshAction accountRefreshAction;
@@ -99,24 +99,23 @@ public class MainForm implements IAccountListener {
 	 */
 	public MainForm(String title) {
 		super();
-		
+
 		this.appTitle = title;
 
-//		try {
-//			ModelService.getInstance().initialize(this);
-//		} catch (StartFailException e) {
-//			JOptionPane.showMessageDialog(frame, Messages
-//					.getString("MainForm.ErrorAppStart") //$NON-NLS-1$
-//					+ Messages.getString("MainForm.ErrorStartJAXB") //$NON-NLS-1$
-//					+ e.getLocalizedMessage(), appTitle,
-//					JOptionPane.ERROR_MESSAGE);
-//			e.printStackTrace();
-//			System.exit(0);
-//		}
+		// try {
+		// ModelService.getInstance().initialize(this);
+		// } catch (StartFailException e) {
+		// JOptionPane.showMessageDialog(frame, Messages
+		//					.getString("MainForm.ErrorAppStart") //$NON-NLS-1$
+		//					+ Messages.getString("MainForm.ErrorStartJAXB") //$NON-NLS-1$
+		// + e.getLocalizedMessage(), appTitle,
+		// JOptionPane.ERROR_MESSAGE);
+		// e.printStackTrace();
+		// System.exit(0);
+		// }
 
 		createAndShowGUI();
 	}
-
 
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	public static ImageIcon createImageIcon(String path) {
@@ -129,7 +128,7 @@ public class MainForm implements IAccountListener {
 			return new ImageIcon();
 		}
 	}
-	
+
 	/**
 	 * Create the GUI and show it. For thread safety, this method should be
 	 * invoked from the event-dispatching thread.
@@ -146,45 +145,47 @@ public class MainForm implements IAccountListener {
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(final WindowEvent e) {
-				//InstanceLock.getInstance().releaseLock();				
-				
-				//fileExitAction.actionPerformed(null);
+				// InstanceLock.getInstance().releaseLock();
+
+				// fileExitAction.actionPerformed(null);
 				System.exit(0);
 			}
 		});
-		
-		GraphicsEnvironment env = 
-			GraphicsEnvironment.getLocalGraphicsEnvironment(); 
-		frame.setMaximizedBounds(env.getMaximumWindowBounds()); // taskbar not covered
 
-		frame.setIconImage(createImageIcon("images/mail_generic22.png").getImage()); //$NON-NLS-1$
+		GraphicsEnvironment env = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		frame.setMaximizedBounds(env.getMaximumWindowBounds()); // taskbar not
+																// covered
+
+		frame
+				.setIconImage(createImageIcon("images/mail_generic22.png").getImage()); //$NON-NLS-1$
 
 		createActions(frame);
-		
+
 		createComponents(frame.getContentPane());
-		
-//		createMenu(frame);
-//		
-//		setToggleMenusAndButtons(null);
-		
-		//frame.setVisible(false);
-		
-		//frame.doLayout();
-				
+
+		// createMenu(frame);
+		//		
+		// setToggleMenusAndButtons(null);
+
+		// frame.setVisible(false);
+
+		// frame.doLayout();
+
 		// Display the window
 		frame.pack();
-		
+
 		// Restore properties
 		restoreProperties();
-		
+
 		// Perform startup actions
 		startup();
-		
+
 		frame.setVisible(true);
-		
+
 		// Loading systray icon and menu
 		loadSystemTray();
-		
+
 	}
 
 	/**
@@ -193,26 +194,26 @@ public class MainForm implements IAccountListener {
 	private void loadSystemTray() {
 		if (SystemTray.isSupported()) {
 			SystemTray tray = SystemTray.getSystemTray();
-			trayIcon = new TrayIcon(createImageIcon(
-								"images/prog16.png").getImage(), //$NON-NLS-1$ 
-								appTitle);
-			
-//			trayIcon.setPopupMenu(PopupFactory.getGeneralPopupAwt(
-//					viewShowHideAppAction, null, emailCheckAllAction,
-//					null, helpAboutAction, fileExitAction));
+			trayIcon = new TrayIcon(
+					createImageIcon("images/prog16.png").getImage(), //$NON-NLS-1$ 
+					appTitle);
 
-			//trayIcon.setImageAutoSize(true);
-			
+			// trayIcon.setPopupMenu(PopupFactory.getGeneralPopupAwt(
+			// viewShowHideAppAction, null, emailCheckAllAction,
+			// null, helpAboutAction, fileExitAction));
+
+			// trayIcon.setImageAutoSize(true);
+
 			trayIcon.addMouseListener(new MouseAdapter() {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					if ((e.getClickCount() > 1) && (e.getClickCount() < 3)) {
-						//viewShowHideAppAction.actionPerformed(null);
+						// viewShowHideAppAction.actionPerformed(null);
 					}
 				}
 			});
-			
+
 			try {
 				tray.add(trayIcon);
 			} catch (AWTException e) {
@@ -228,59 +229,63 @@ public class MainForm implements IAccountListener {
 	 * Performing startup actions if they were specified in preferences
 	 */
 	private void startup() {
-//		if (ModelService.getInstance().getPreferencesWorker().isLoadLastFile()) {
-//			fileOpenAction.setOpenedFile(ModelService.getInstance().getPreferencesWorker().getLastFile());
-//			try {
-//				ModelService.getInstance().getAccountWorker().openFile(
-//						ModelService.getInstance().getPreferencesWorker().getLastFileName());
-//				updateUI(fileOpenAction);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		
-//		if (ModelService.getInstance().getPreferencesWorker().isCheckOnStart()) {
-//			emailCheckAllAction.actionPerformed(null);
-//		}
-		
+		// if
+		// (ModelService.getInstance().getPreferencesWorker().isLoadLastFile())
+		// {
+		// fileOpenAction.setOpenedFile(ModelService.getInstance().getPreferencesWorker().getLastFile());
+		// try {
+		// ModelService.getInstance().getAccountWorker().openFile(
+		// ModelService.getInstance().getPreferencesWorker().getLastFileName());
+		// updateUI(fileOpenAction);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		// }
+		//		
+		// if
+		// (ModelService.getInstance().getPreferencesWorker().isCheckOnStart())
+		// {
+		// emailCheckAllAction.actionPerformed(null);
+		// }
+
 	}
 
 	/**
 	 * Restore properties from registry
 	 */
 	private void restoreProperties() {
-//		Preferences prefs = ModelService.getInstance().getPreferencesWorker()
-//				.getPrefs();
-//
-//		Double areaLogHeight = Double.valueOf(prefs.get("areaLogHeight", "0")); //$NON-NLS-1$ //$NON-NLS-2$
-//		areaLogScrollPane.setSize(-1, areaLogHeight.intValue());
-//		if (areaLogHeight == 0) {
-//			splitPaneUpDown.setDividerLocation(10000);
-//		}
-//		updateViewLogAction(true);
-//
-//		// Restoring tables info
-//		ModelService.getInstance().getPreferencesWorker().restoreTableInfo(
-//				tableEmails);
-//		ModelService.getInstance().getPreferencesWorker().restoreTableInfo(
-//				tableAccounts);
+		// Preferences prefs = ModelService.getInstance().getPreferencesWorker()
+		// .getPrefs();
+		//
+		//		Double areaLogHeight = Double.valueOf(prefs.get("areaLogHeight", "0")); //$NON-NLS-1$ //$NON-NLS-2$
+		// areaLogScrollPane.setSize(-1, areaLogHeight.intValue());
+		// if (areaLogHeight == 0) {
+		// splitPaneUpDown.setDividerLocation(10000);
+		// }
+		// updateViewLogAction(true);
+		//
+		// // Restoring tables info
+		// ModelService.getInstance().getPreferencesWorker().restoreTableInfo(
+		// tableEmails);
+		// ModelService.getInstance().getPreferencesWorker().restoreTableInfo(
+		// tableAccounts);
 	}
 
 	/**
 	 * Saving properties to registry
 	 */
 	public void saveProperties() {
-//		Preferences prefs = ModelService.getInstance().getPreferencesWorker()
-//				.getPrefs();
-//
-//		prefs.put("areaLogHeight", String.valueOf(areaLogScrollPane.getSize() //$NON-NLS-1$
-//				.getHeight()));
-//
-//		// Saving tables info
-//		ModelService.getInstance().getPreferencesWorker().saveTableInfo(
-//				tableEmails);
-//		ModelService.getInstance().getPreferencesWorker().saveTableInfo(
-//				tableAccounts);
+		// Preferences prefs = ModelService.getInstance().getPreferencesWorker()
+		// .getPrefs();
+		//
+		//		prefs.put("areaLogHeight", String.valueOf(areaLogScrollPane.getSize() //$NON-NLS-1$
+		// .getHeight()));
+		//
+		// // Saving tables info
+		// ModelService.getInstance().getPreferencesWorker().saveTableInfo(
+		// tableEmails);
+		// ModelService.getInstance().getPreferencesWorker().saveTableInfo(
+		// tableAccounts);
 
 	}
 
@@ -291,41 +296,46 @@ public class MainForm implements IAccountListener {
 	 *            Frame
 	 */
 	private void createActions(JFrame fr) {
-//		fileSaveAction = new FileSaveAction(this);
-//		fileSaveAsAction = new FileSaveAsAction(this);
-//		fileExitAction = new FileExitAction(this, fileSaveAction);
-//		fileNewAction = new FileNewAction(this, fileSaveAction);
-//		fileOpenAction = new FileOpenAction(this, fileSaveAction);
-//		
-//		viewShowOldEmailsAction = new ViewShowOldEmailsAction(this);
-//		viewSelectAllEmailsAction = new ViewSelectAllEmailsAction(this);
-//		viewSelectAllEmailsButLastAction = new ViewSelectAllEmailsButLastAction(this);
-//		viewShowHideAppAction = new ViewShowHideAppAction(this);
-//
+		// fileSaveAction = new FileSaveAction(this);
+		// fileSaveAsAction = new FileSaveAsAction(this);
+		// fileExitAction = new FileExitAction(this, fileSaveAction);
+		// fileNewAction = new FileNewAction(this, fileSaveAction);
+		// fileOpenAction = new FileOpenAction(this, fileSaveAction);
+		//		
+		// viewShowOldEmailsAction = new ViewShowOldEmailsAction(this);
+		// viewSelectAllEmailsAction = new ViewSelectAllEmailsAction(this);
+		// viewSelectAllEmailsButLastAction = new
+		// ViewSelectAllEmailsButLastAction(this);
+		// viewShowHideAppAction = new ViewShowHideAppAction(this);
+		//
 		accountEditAction = new AccountEditAction(this);
 		accountRefreshAction = new AccountRefreshAction(this);
-//
-//		emailCheckAllAction = new EmailCheckAllAction(this);
-//		emailCheckAgainsMainAccount = new EmailCheckAgainstMainAccountAction(this);
-//		emailCheckAgainsMainAccountAll = new EmailCheckAgainstMainAccountActionAll(this);
-//		emailCheckCancelAction = new EmailCheckCancelAction(this);
-//		emailDeleteAccountEmailsAction = new EmailDeleteAccountEmailsAction(this, accountEmailRetrieveAction);
-//		emailDeleteAllEmailsButOneAction = new EmailDeleteAllEmailsButOneAction(this);
-//		emailDeleteAllEmailsAction = new EmailDeleteAllEmailsAction(this);
-//		
-//		otherSettingsAction = new OtherSettingsAction(this);
-//		otherViewLogAction = new OtherViewLogAction(this);
-//
-//		logSaveAsAction = new LogSaveAsAction(this);
-//
-//		helpAboutAction = new HelpAboutAction(this);
+		//
+		// emailCheckAllAction = new EmailCheckAllAction(this);
+		// emailCheckAgainsMainAccount = new
+		// EmailCheckAgainstMainAccountAction(this);
+		// emailCheckAgainsMainAccountAll = new
+		// EmailCheckAgainstMainAccountActionAll(this);
+		// emailCheckCancelAction = new EmailCheckCancelAction(this);
+		// emailDeleteAccountEmailsAction = new
+		// EmailDeleteAccountEmailsAction(this, accountEmailRetrieveAction);
+		// emailDeleteAllEmailsButOneAction = new
+		// EmailDeleteAllEmailsButOneAction(this);
+		// emailDeleteAllEmailsAction = new EmailDeleteAllEmailsAction(this);
+		//		
+		// otherSettingsAction = new OtherSettingsAction(this);
+		// otherViewLogAction = new OtherViewLogAction(this);
+		//
+		// logSaveAsAction = new LogSaveAsAction(this);
+		//
+		// helpAboutAction = new HelpAboutAction(this);
 	}
-
 
 	/**
 	 * Creating all visual components
 	 * 
-	 * @param contentPane Pane to add components to
+	 * @param contentPane
+	 *            Pane to add components to
 	 */
 	private void createComponents(Container contentPane) {
 
@@ -344,7 +354,7 @@ public class MainForm implements IAccountListener {
 		splitPaneUpDown.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPaneUpDown.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(final PropertyChangeEvent e) {
-				//updateViewLogAction(true);
+				// updateViewLogAction(true);
 			}
 		});
 		contentPane.add(splitPaneUpDown);
@@ -361,17 +371,17 @@ public class MainForm implements IAccountListener {
 		splitPaneLeftRight.setLeftComponent(scrollPane);
 
 		createAccountsTree(scrollPane);
-		
-//		scrollPane = new JScrollPane();
-//		splitPaneLeftRight.setRightComponent(scrollPane);
 
-		//createMailsTable(scrollPane);
-	
+		// scrollPane = new JScrollPane();
+		// splitPaneLeftRight.setRightComponent(scrollPane);
+
+		// createMailsTable(scrollPane);
+
 		contentPane.add(createStatusBar(), BorderLayout.SOUTH);
-		
+
 		createToolBar(contentPane);
 	}
-	
+
 	/**
 	 * Creating toolbar
 	 * 
@@ -388,12 +398,11 @@ public class MainForm implements IAccountListener {
 		button = new JButton(accountEditAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		button = new JButton(accountRefreshAction);
 		button.setText(null);
 		toolBar.add(button);
 	}
-
 
 	/**
 	 * Creating status bar component with all controls
@@ -415,50 +424,51 @@ public class MainForm implements IAccountListener {
 		labelLoading.setText(""); //$NON-NLS-1$
 		labelLoading.setVisible(false);
 		panelStatusBar.add(labelLoading);
-		
+
 		labelStatusBar = new JLabel();
 		labelStatusBar.setText(" "); //$NON-NLS-1$
 		panelStatusBar.add(labelStatusBar);
-		
+
 		return panelStatusBar;
 	}
 
-
 	private JComponent createEntryViewArea() {
 		JPanel panel = new JPanel(new BorderLayout());
-		
+
 		textAreaLog = new JTextArea();
 		textAreaLog.setEditable(false);
 		textAreaLog.setLineWrap(true);
 		textAreaLog.setWrapStyleWord(true);
 		textAreaLog.addMouseListener(new PopupListener(PopupFactory
 				.getGeneralPopup(PopupFactory.getEditPopup())));
-		
+
 		JScrollPane areaLogScrollPane = new JScrollPane(textAreaLog);
 		areaLogScrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		areaLogScrollPane.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createCompoundBorder(
-						BorderFactory.createTitledBorder("Log"), BorderFactory
-								.createEmptyBorder(0, 0, 0, 0)),
-				areaLogScrollPane.getBorder()));
+				BorderFactory.createCompoundBorder(BorderFactory
+						.createTitledBorder("Log"), BorderFactory
+						.createEmptyBorder(0, 0, 0, 0)), areaLogScrollPane
+						.getBorder()));
 		panel.add(areaLogScrollPane);
 		return panel;
 	}
-	
+
 	/**
 	 * Creating components for displaying account with blogs
-	 * @param scrollPane Pane to add components to
+	 * 
+	 * @param scrollPane
+	 *            Pane to add components to
 	 */
 	private void createAccountsTree(JScrollPane scrollPane) {
-		blogsTreeModel = new BlogsTreeDataModel();
-		treeBlogs = new JTree(blogsTreeModel){
-			public String convertValueToText(Object value, boolean selected, boolean expanded,
-					boolean leaf, int row, boolean hasFocus){
-				if (value instanceof Account){
+		treeModelBlogs = new BlogsTreeDataModel();
+		treeBlogs = new JTree(treeModelBlogs) {
+			public String convertValueToText(Object value, boolean selected,
+					boolean expanded, boolean leaf, int row, boolean hasFocus) {
+				if (value instanceof Account) {
 					Account account = (Account) value;
 					return account.getLogin();
-				} else if (value instanceof Blog){
+				} else if (value instanceof Blog) {
 					Blog blog = (Blog) value;
 					return blog.getName();
 				}
@@ -466,7 +476,7 @@ public class MainForm implements IAccountListener {
 			}
 		};
 		scrollPane.setViewportView(treeBlogs);
-		
+
 	}
 
 	private void initLookAndFeel() {
@@ -481,29 +491,29 @@ public class MainForm implements IAccountListener {
 			} else if (LOOKANDFEEL.equals("GTK+")) { // new in 1.4.2  //$NON-NLS-1$
 				lookAndFeel = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel"; //$NON-NLS-1$
 			} else {
-//				System.err.println(Messages
-//						.getString("MainForm.UnexpectedLFValue") //$NON-NLS-1$
-//						+ LOOKANDFEEL);
+				// System.err.println(Messages
+				//						.getString("MainForm.UnexpectedLFValue") //$NON-NLS-1$
+				// + LOOKANDFEEL);
 				lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
 			}
 
 			try {
 				UIManager.setLookAndFeel(lookAndFeel);
 			} catch (ClassNotFoundException e) {
-//				System.err.println(Messages.getString("MainForm.NoClassForLF") //$NON-NLS-1$
-//						+ lookAndFeel);
-//				System.err.println(Messages.getString("MainForm.LibLFThere")); //$NON-NLS-1$
-//				System.err.println(Messages.getString("MainForm.UseDefLF")); //$NON-NLS-1$
+				//				System.err.println(Messages.getString("MainForm.NoClassForLF") //$NON-NLS-1$
+				// + lookAndFeel);
+				//				System.err.println(Messages.getString("MainForm.LibLFThere")); //$NON-NLS-1$
+				//				System.err.println(Messages.getString("MainForm.UseDefLF")); //$NON-NLS-1$
 			} catch (UnsupportedLookAndFeelException e) {
-//				System.err.println(Messages.getString("MainForm.UnableUseLF") //$NON-NLS-1$
-//						+ lookAndFeel
-//						+ Messages.getString("MainForm.OnThisPlatform")); //$NON-NLS-1$
-//				System.err.println(Messages.getString("MainForm.UseDefLF")); //$NON-NLS-1$
+				//				System.err.println(Messages.getString("MainForm.UnableUseLF") //$NON-NLS-1$
+				// + lookAndFeel
+				//						+ Messages.getString("MainForm.OnThisPlatform")); //$NON-NLS-1$
+				//				System.err.println(Messages.getString("MainForm.UseDefLF")); //$NON-NLS-1$
 			} catch (Exception e) {
-//				System.err.println(Messages.getString("MainForm.UnableGetLF") //$NON-NLS-1$
-//						+ lookAndFeel
-//						+ Messages.getString("MainForm.ForSomeReason")); //$NON-NLS-1$
-//				System.err.println(Messages.getString("MainForm.UseDefLF")); //$NON-NLS-1$
+				//				System.err.println(Messages.getString("MainForm.UnableGetLF") //$NON-NLS-1$
+				// + lookAndFeel
+				//						+ Messages.getString("MainForm.ForSomeReason")); //$NON-NLS-1$
+				//				System.err.println(Messages.getString("MainForm.UseDefLF")); //$NON-NLS-1$
 				e.printStackTrace();
 			}
 		}
@@ -517,7 +527,6 @@ public class MainForm implements IAccountListener {
 		// Center window on screen
 		frame.setLocationRelativeTo(null);
 	}
-
 
 	public JFrame getFrame() {
 		return frame;
@@ -536,17 +545,15 @@ public class MainForm implements IAccountListener {
 	public synchronized void addLog(String message) {
 		Calendar now = Calendar.getInstance();
 		if (textAreaLog.getText().equals("")) //$NON-NLS-1$
-			textAreaLog.setText(
-					String.format("%tT", now) //$NON-NLS-1$
-					+ ": "  //$NON-NLS-1$
+			textAreaLog.setText(String.format("%tT", now) //$NON-NLS-1$
+					+ ": " //$NON-NLS-1$
 					+ message);
 		else
-			textAreaLog.setText(textAreaLog.getText()
-					+ Messages.NEW_LINE
+			textAreaLog.setText(textAreaLog.getText() + Messages.NEW_LINE
 					+ String.format("%tT", now) //$NON-NLS-1$
-					+ ": "  //$NON-NLS-1$
+					+ ": " //$NON-NLS-1$
 					+ message);
-		textAreaLog.setSelectionStart(textAreaLog.getText().length()-1);
+		textAreaLog.setSelectionStart(textAreaLog.getText().length() - 1);
 	}
 
 	/**
@@ -557,42 +564,63 @@ public class MainForm implements IAccountListener {
 	public String getLogText() {
 		return textAreaLog.getText();
 	}
-	
+
 	/**
 	 * Getting table object that corresponds to emails table
+	 * 
 	 * @return Emails table
 	 */
 	public JTable getTableEmails() {
 		return tableEmails;
 	}
-	
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.domain.IAccountListener#accountCreated(ua.jdesktopblogger.domain.Account)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.domain.IAccountListener#accountCreated(ua.jdesktopblogger
+	 * .domain.Account)
 	 */
 	@Override
 	public void accountCreated(Account account) {
-		blogsTreeModel.addAccount(account);
+		treeModelBlogs.addAccount(account);
 		treeBlogs.updateUI();
-		
+
 		// Enabling actions
 		accountRefreshAction.setEnabled(true);
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.domain.IAccountListener#accountEdited(ua.jdesktopblogger.domain.Account)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.domain.IAccountListener#accountEdited(ua.jdesktopblogger
+	 * .domain.Account)
 	 */
 	@Override
 	public void accountEdited(Account account) {
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.domain.IAccountListener#accountRefreshed(ua.jdesktopblogger.domain.Account)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeua.jdesktopblogger.domain.IAccountListener#accountRefreshed(ua.
+	 * jdesktopblogger.domain.Account)
 	 */
 	@Override
 	public void accountRefreshed(Account account) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	/**
+	 * Getting selected account from the tree
+	 * 
+	 * @return Selected account or <code>null</code>
+	 */
+	public Account getSelectedAccount() {
+		return null;
 	}
 
 }
