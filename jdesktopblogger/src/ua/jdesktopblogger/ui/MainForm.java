@@ -48,6 +48,7 @@ import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
 import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
+import ua.jdesktopblogger.ui.renderers.TreeCellAccountRenderer;
 
 public class MainForm implements IAccountListener {
 
@@ -476,6 +477,8 @@ public class MainForm implements IAccountListener {
 				return "";
 			}
 		};
+		TreeCellAccountRenderer treeCellAccountRenderer = new TreeCellAccountRenderer(); 
+		treeBlogs.setCellRenderer(treeCellAccountRenderer);
 		scrollPane.setViewportView(treeBlogs);
 
 	}
