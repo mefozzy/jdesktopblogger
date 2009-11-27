@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -21,28 +23,43 @@ public class AccountServiceImpl implements IAccountService {
 
 	private JAXBContext jc = null;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Account getLoadedAccount(String login) throws AccountIOException {
 		try {
-			if (jc == null) {
-				createJAXBContext();
-			}
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			StringBuffer sb = buildSettingsDir();
-
 			sb.append(login).append(".xml");
-			JAXBElement<Account> res = (JAXBElement<Account>) unmarshaller
-					.unmarshal(new FileInputStream(sb.toString()));
-			Account account = res.getValue();
-			account.decryptPasswd();
-			return account;
+			String fileName = sb.toString();
+
+			return loadAccountFromFile(fileName);
 
 		} catch (JAXBException e) {
 			throw new AccountIOException(e);
 		} catch (FileNotFoundException e1) {
 			throw new AccountIOException(e1);
 		}
+	}
+
+	/**
+	 * Loading account from file, by parsing file
+	 * 
+	 * @param fileName
+	 *            File name to load account from
+	 * @return Loaded account object
+	 * @throws JAXBException
+	 *             If parsing fails
+	 * @throws FileNotFoundException
+	 *             If file is not found
+	 */
+	@SuppressWarnings("unchecked")
+	private Account loadAccountFromFile(String fileName) throws JAXBException,
+			FileNotFoundException {
+		Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
+
+		JAXBElement<Account> res = (JAXBElement<Account>) unmarshaller
+				.unmarshal(new FileInputStream(fileName));
+		Account account = res.getValue();
+		account.decryptPasswd();
+		return account;
 	}
 
 	/**
@@ -60,13 +77,14 @@ public class AccountServiceImpl implements IAccountService {
 		return sb;
 	}
 
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.services.IAccountService#saveAccount(ua.jdesktopblogger.domain.Account)
+	 */
 	@Override
 	public void saveAccount(Account account) throws AccountIOException {
 		try {
-			if (jc == null) {
-				createJAXBContext();
-			}
-			Marshaller marshaller = jc.createMarshaller();
+
+			Marshaller marshaller = getJAXBContext().createMarshaller();
 			if (account != null && account.getLogin() != "") {
 				StringBuffer sb = buildSettingsDir();
 
@@ -96,8 +114,36 @@ public class AccountServiceImpl implements IAccountService {
 		}
 	}
 
-	private void createJAXBContext() throws JAXBException {
-		jc = JAXBContext.newInstance(PACKAGE_NAME);
+	private JAXBContext getJAXBContext() throws JAXBException {
+		if (jc == null) {
+			jc = JAXBContext.newInstance(PACKAGE_NAME);
+		}
+		return jc;
+	}
+
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.services.IAccountService#loadSavedAccounts()
+	 */
+	@Override
+	public Collection<Account> loadSavedAccounts() throws AccountIOException {
+		StringBuffer dirName = buildSettingsDir();
+		File dir = new File(dirName.toString());
+		
+		Collection<Account> rez = new ArrayList<Account>();
+		
+		for (File file : dir.listFiles()) {
+			if ((!file.isDirectory()) && (file.canRead())) {
+				try {
+					Account account = loadAccountFromFile(file.getAbsolutePath());
+					
+					rez.add(account);
+				} catch (Exception e) {
+					System.err.println("Failed to load account from " + file.getAbsolutePath() + " >>> " + e);
+				}
+			}
+		}
+		
+		return rez;
 	}
 
 }
