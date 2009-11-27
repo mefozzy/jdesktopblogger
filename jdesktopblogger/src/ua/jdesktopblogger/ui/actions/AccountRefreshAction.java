@@ -38,6 +38,7 @@ public class AccountRefreshAction extends SuperAction {
 
 			try {
 				ServiceFactory.getDefaultFactory().getBlogService().refreshAccount(account);
+				form.accountRefreshed(account);
 			} catch (BlogServiceException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(form.getFrame(),
@@ -46,8 +47,6 @@ public class AccountRefreshAction extends SuperAction {
 						e.getLocalizedMessage(),
 						form.getAppTitle(), JOptionPane.ERROR_MESSAGE);
 			}
-			form.accountRefreshed(account);
-			
 		} else {
 			JOptionPane.showMessageDialog(form.getFrame(),
 					"Please, select an account for refreshing", form
