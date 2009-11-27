@@ -1,6 +1,7 @@
 package ua.jdesktopblogger.services.impl;
 
 import ua.jdesktopblogger.domain.Account;
+import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.excetions.BlogServiceException;
 import ua.jdesktopblogger.providers.IBlogProvider;
 import ua.jdesktopblogger.providers.ProviderFactory;
@@ -16,7 +17,7 @@ public class BlogServiceImpl implements IBlogService {
 	 * @see ua.jdesktopblogger.services.IBlogService#refreshAccount(ua.jdesktopblogger.domain.Account)
 	 */
 	@Override
-	public void refreshAccount(Account account) throws BlogServiceException {
+	public void refreshAccount(Account account, IAccountListener accountListener) throws BlogServiceException {
 		IBlogProvider pr = ProviderFactory.getBlogProvider(account);
 		
 		if (account.getProviderObject() == null) {
@@ -24,6 +25,8 @@ public class BlogServiceImpl implements IBlogService {
 		}
 		
 		account.setBlogs(pr.loadListOfBlogs(account));
+		
+		accountListener.accountRefreshed(account);
 	}
 
 }

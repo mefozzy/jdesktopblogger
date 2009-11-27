@@ -37,8 +37,7 @@ public class AccountRefreshAction extends SuperAction {
 		if (account != null) {
 
 			try {
-				ServiceFactory.getDefaultFactory().getBlogService().refreshAccount(account);
-				form.accountRefreshed(account);
+				ServiceFactory.getDefaultFactory().getBlogService().refreshAccount(account, form);
 			} catch (BlogServiceException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(form.getFrame(),
