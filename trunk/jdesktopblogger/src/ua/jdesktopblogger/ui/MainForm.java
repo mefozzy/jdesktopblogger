@@ -679,6 +679,8 @@ public class MainForm implements IAccountListener {
 	@Override
 	public void accountRefreshed(Account account) {
 		System.out.println("Refreshed!");
+		
+		treeBlogs.updateUI();
 	}
 
 	/**
