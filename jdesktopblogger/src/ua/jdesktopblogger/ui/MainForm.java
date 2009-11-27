@@ -445,7 +445,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setMaxWidth(50);
 		col.setPreferredWidth(20);
 		DefaultTableCellRenderer boolRenderer = new DefaultTableCellRenderer();
-//		BooleanCellRenderer boolRenderer = new BooleanCellRenderer();
+		boolRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(boolRenderer);
 		
 		// Setting column edited date props
@@ -454,7 +454,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setMaxWidth(170);
 		col.setPreferredWidth(150);
 		DateRenderer dateEditRenderer = new DateRenderer();
-		dateEditRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		dateEditRenderer.setHorizontalAlignment(SwingConstants.LEFT);
 		col.setCellRenderer(dateEditRenderer);
 
 		// Setting column published date props
@@ -463,7 +463,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setMaxWidth(170);
 		col.setPreferredWidth(150);
 		DateRenderer datePublishRenderer = new DateRenderer();
-		datePublishRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		datePublishRenderer.setHorizontalAlignment(SwingConstants.LEFT);
 		col.setCellRenderer(datePublishRenderer);
 
 	}
