@@ -29,7 +29,6 @@ public class AccountServiceTest {
 	public void setUp() throws Exception {
 		account = new Account();
 		account.setLogin("login");
-		account.setId("id");
 		account.setPassword("password");
 	}
 
