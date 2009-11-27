@@ -24,7 +24,7 @@ import sun.misc.BASE64Encoder;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "account", propOrder = { "login", "password" })
+@XmlType(name = "account", propOrder = { "login", "password" , "encrypt"})
 public class Account {
 	
 	private static final String ALGORITHM = "AES";
@@ -32,10 +32,7 @@ public class Account {
     private static final byte[] keyValue = 
         new byte[] { 'T', 'h', 'i', 's', 'I', 's', 'A', 'S', 'e', 'c', 'r', 'e', 't', 'K', 'e', 'y' };
 	
-	@XmlTransient
-	private boolean encrypt = false;
-
-	/**
+    /**
 	 * Blog provider access object that is used by blog provider to store its
 	 * connection or some other needed information. For every method call of
 	 * blog provider the account object is passed, so blog provider can store
@@ -51,6 +48,9 @@ public class Account {
 	/** User password */
 	@XmlElement(required = true)
 	private String password;
+	
+	@XmlElement(name="en", required = true)
+	private boolean encrypt = false;
 
 	/** Collection of account blogs */
 	@XmlTransient
