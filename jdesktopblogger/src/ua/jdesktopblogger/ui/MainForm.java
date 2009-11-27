@@ -49,10 +49,9 @@ import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
-import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
 import ua.jdesktopblogger.ui.renderers.DateRenderer;
 import ua.jdesktopblogger.ui.renderers.TreeCellAccountRenderer;
-import ua.jdesktopblogger.ui.tables.TableMessageModel;
+import ua.jdesktopblogger.ui.tables.TablePostModel;
 import ua.jdesktopblogger.ui.tables.TableSorterWithoutZeroColumn;
 
 public class MainForm implements IAccountListener {
@@ -96,7 +95,7 @@ public class MainForm implements IAccountListener {
 
 	private BlogsTreeDataModel treeModelBlogs;
 	
-	private TableMessageModel tableMsgsModel;
+	private TablePostModel tablePostModel;
 
 	// //////////////////////////////////////////////////////////////////////////////////
 
@@ -392,9 +391,9 @@ public class MainForm implements IAccountListener {
 	}
 
 	private void createBlogsTable(JScrollPane scrollPane) {
-		tableMsgsModel = new TableMessageModel();
+		tablePostModel = new TablePostModel();
 		TableSorterWithoutZeroColumn sorter = 
-			new TableSorterWithoutZeroColumn(tableMsgsModel);
+			new TableSorterWithoutZeroColumn(tablePostModel);
 		
 		tableBlogs = new JTable(sorter);
 		sorter.setTableHeader(tableBlogs.getTableHeader());
@@ -422,28 +421,37 @@ public class MainForm implements IAccountListener {
 		
 		// Setting column name props
 		col = tableBlogs.getColumnModel().getColumn(
-				TableMessageModel.ACCOUNT_COLUMN_NAME);
+				TablePostModel.ACCOUNT_COLUMN_NAME);
 		DefaultTableCellRenderer namesRenderer = new DefaultTableCellRenderer();
 		//namesRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(namesRenderer);
 
 		// Setting column num props
 		col = tableBlogs.getColumnModel().getColumn(
-				TableMessageModel.ACCOUNT_COLUMN_NUM);
+				TablePostModel.ACCOUNT_COLUMN_NUM);
 		col.setMaxWidth(100);
 		col.setPreferredWidth(50);
 		DefaultTableCellRenderer numRenderer = new DefaultTableCellRenderer();
 		col.setCellRenderer(numRenderer);
 		
-		// Setting column emails props
+		// Setting column edited date props
 		col = tableBlogs.getColumnModel().getColumn(
-				TableMessageModel.ACCOUNT_COLUMN_DATE);
+				TablePostModel.ACCOUNT_COLUMN_DATE_EDITED);
 		col.setMaxWidth(100);
 		col.setPreferredWidth(70);
-		DateRenderer dateRenderer = new DateRenderer();
-		dateRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-		col.setCellRenderer(dateRenderer);
-		
+		DateRenderer dateEditRenderer = new DateRenderer();
+		dateEditRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		col.setCellRenderer(dateEditRenderer);
+
+		// Setting column published date props
+		col = tableBlogs.getColumnModel().getColumn(
+				TablePostModel.ACCOUNT_COLUMN_DATE_PUBLISHED);
+		col.setMaxWidth(100);
+		col.setPreferredWidth(70);
+		DateRenderer datePublishRenderer = new DateRenderer();
+		datePublishRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		col.setCellRenderer(datePublishRenderer);
+
 	}
 
 	/**
