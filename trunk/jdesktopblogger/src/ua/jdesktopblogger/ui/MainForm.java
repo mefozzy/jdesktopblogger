@@ -398,6 +398,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		tablePostModel = new TablePostModel(this);
 		TableSorterWithoutZeroColumn sorter = 
 			new TableSorterWithoutZeroColumn(tablePostModel);
+		sorter.setSortingStatus(3, TableSorterWithoutZeroColumn.DESCENDING);
 		
 		tableBlogs = new JTable(sorter);
 		sorter.setTableHeader(tableBlogs.getTableHeader());
