@@ -37,6 +37,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.tree.TreePath;
 
 import ua.cn.yet.common.ui.popup.PopupFactory;
 import ua.cn.yet.common.ui.popup.PopupListener;
@@ -620,7 +621,12 @@ public class MainForm implements IAccountListener {
 	 * @return Selected account or <code>null</code>
 	 */
 	public Account getSelectedAccount() {
-		return null;
+		TreePath path = treeBlogs.getSelectionPath();
+		if (path != null) {
+			return (Account) path.getPath()[0];
+		} else {
+			return null;
+		}
 	}
 
 }
