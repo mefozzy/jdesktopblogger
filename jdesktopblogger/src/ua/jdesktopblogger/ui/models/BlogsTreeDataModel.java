@@ -1,7 +1,7 @@
 package ua.jdesktopblogger.ui.models;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -11,7 +11,7 @@ import ua.jdesktopblogger.domain.Blog;
 
 public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 
-	private List<Account> accountsList = new ArrayList<Account>();
+	private Set<Account> accountsList = new HashSet<Account>();
 
 	@Override
 	public Object getChild(Object parent, int index) {
@@ -20,8 +20,10 @@ public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 			if (index < account.getBlogs().size()){
 				return account.getBlogs().toArray()[index];
 			}
+		} else if (parent instanceof String){
+			return accountsList.toArray()[index];
 		}
-		return null;
+		return accountsList.size();
 	}
 
 	@Override
@@ -29,8 +31,9 @@ public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 		if (parent instanceof Account){
 			Account account = (Account) parent;
 			return account.getBlogs().size();
+		} else {
+			return accountsList.size();
 		} 
-		return 0;
 	}
 
 	@Override
@@ -45,16 +48,25 @@ public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 				}
 				result++;
 			}
+		} else if (parent instanceof String){
+			int result = 0;
+			Account childAccount = (Account) child;
+			for (Account account: accountsList){
+				if (account.getLogin().equals(childAccount.getLogin())){
+					return result;
+				}
+				result++;
+			}
 		}
 		return 0;
 	}
 
 	@Override
 	public Object getRoot() {
-		if (accountsList.size() > 0){
-			return accountsList.get(0);
-		}
-		return null;
+//		if (accountsList.size() > 0){
+//			return accountsList.get(0);
+//		}
+		return "Accounts";
 	}
 
 	@Override
@@ -71,11 +83,6 @@ public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 	
 	
 	public void addAccount(Account newAccount){
-		for (Account account: accountsList){
-			if (account.getLogin().equals(newAccount.getLogin())){
-				return;
-			}
-		}
 		accountsList.add(newAccount);
 	}
 	
