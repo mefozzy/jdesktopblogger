@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import ua.jdesktopblogger.domain.Account;
@@ -148,7 +149,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 	 * .domain.Account, ua.jdesktopblogger.domain.Blog)
 	 */
 	@Override
-	public Set<Post> loadListOfPosts(Account account, Blog blog)
+	public SortedSet<Post> loadListOfPosts(Account account, Blog blog)
 			throws BlogServiceException, IllegalArgumentException {
 
 		if (account.getProviderObject() == null) {
@@ -169,7 +170,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 
 		Feed resultFeed = getFeedFromAccount(account, feedUrl);
 		
-		Set<Post> rez = new TreeSet<Post>();
+		SortedSet<Post> rez = new TreeSet<Post>();
 
 		// Print the results
 		for (int i = 0; i < resultFeed.getEntries().size(); i++) {
