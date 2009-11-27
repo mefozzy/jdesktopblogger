@@ -45,6 +45,7 @@ import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
+import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
 import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
 
 public class MainForm implements IAccountListener {
@@ -91,6 +92,7 @@ public class MainForm implements IAccountListener {
 	////////////////////////////////////////////////////////////////////////////////////
 
 	private AccountEditAction accountEditAction;
+	private AccountRefreshAction accountRefreshAction;
 
 	/**
 	 * Create the class and frame
@@ -300,10 +302,8 @@ public class MainForm implements IAccountListener {
 //		viewSelectAllEmailsButLastAction = new ViewSelectAllEmailsButLastAction(this);
 //		viewShowHideAppAction = new ViewShowHideAppAction(this);
 //
-//		accountEmailRetrieveAction = new AccountEmailRetrieveAction(this);
-//		accountAddAction = new AccountAddAction(this);
 		accountEditAction = new AccountEditAction(this);
-//		accountDelAction = new AccountDeleteAction(this);
+		accountRefreshAction = new AccountRefreshAction(this);
 //
 //		emailCheckAllAction = new EmailCheckAllAction(this);
 //		emailCheckAgainsMainAccount = new EmailCheckAgainstMainAccountAction(this);
@@ -386,6 +386,10 @@ public class MainForm implements IAccountListener {
 		contentPane.add(toolBar, BorderLayout.NORTH);
 
 		button = new JButton(accountEditAction);
+		button.setText(null);
+		toolBar.add(button);
+		
+		button = new JButton(accountRefreshAction);
 		button.setText(null);
 		toolBar.add(button);
 	}
@@ -562,18 +566,29 @@ public class MainForm implements IAccountListener {
 		return tableEmails;
 	}
 	
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.domain.IAccountListener#accountCreated(ua.jdesktopblogger.domain.Account)
+	 */
 	@Override
 	public void accountCreated(Account account) {
-		System.out.println("Hello " + account);
 		blogsTreeModel.addAccount(account);
 		treeBlogs.updateUI();
+		
+		// Enabling actions
+		accountRefreshAction.setEnabled(true);
 	}
 
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.domain.IAccountListener#accountEdited(ua.jdesktopblogger.domain.Account)
+	 */
 	@Override
 	public void accountEdited(Account account) {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.domain.IAccountListener#accountRefreshed(ua.jdesktopblogger.domain.Account)
+	 */
 	@Override
 	public void accountRefreshed(Account account) {
 		// TODO Auto-generated method stub
