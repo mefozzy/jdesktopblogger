@@ -4,6 +4,7 @@ import java.util.Set;
 
 import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
+import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.AccountAuthenticateException;
 import ua.jdesktopblogger.excetions.BlogServiceException;
 
@@ -48,5 +49,20 @@ public interface IBlogProvider {
 	 */
 	public Set<Blog> loadListOfBlogs(Account account)
 			throws BlogServiceException;
+
+	/**
+	 * Loading set of user posts within specified blog
+	 * 
+	 * @param account
+	 *            Account to use
+	 * @param blog
+	 *            Blog to load posts for
+	 * @return Set of posts
+	 * @throws BlogServiceException
+	 *             If error occurs
+	 * @throws IllegalArgumentException If blog is not valid
+	 */
+	public Set<Post> loadListOfPosts(Account account, Blog blog)
+			throws BlogServiceException, IllegalArgumentException;
 
 }

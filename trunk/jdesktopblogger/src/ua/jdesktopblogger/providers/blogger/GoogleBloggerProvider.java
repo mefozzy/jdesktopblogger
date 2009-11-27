@@ -3,11 +3,13 @@ package ua.jdesktopblogger.providers.blogger;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.TreeSet;
 
 import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
+import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.AccountAuthenticateException;
 import ua.jdesktopblogger.excetions.BlogServiceException;
 import ua.jdesktopblogger.providers.IBlogProvider;
@@ -44,11 +46,11 @@ public class GoogleBloggerProvider implements IBlogProvider {
 	@Override
 	public Set<Blog> loadListOfBlogs(Account account)
 			throws BlogServiceException {
-		
+
 		if (account.getProviderObject() == null) {
 			login(account);
 		}
-		
+
 		// Request the feed
 		URL feedUrl;
 		try {
@@ -56,28 +58,21 @@ public class GoogleBloggerProvider implements IBlogProvider {
 		} catch (MalformedURLException e) {
 			throw new BlogServiceException(e);
 		}
-		
-		BloggerService myService = (BloggerService) account.getProviderObject();
-		
-		Feed resultFeed;
-		try {
-			resultFeed = myService.getFeed(feedUrl, Feed.class);
-		} catch (Exception e) {
-			throw new BlogServiceException(e);
-		}
-		
+
+		Feed resultFeed = getFeedFromAccount(account, feedUrl);
+
 		Set<Blog> rez = new TreeSet<Blog>();
 
 		for (int i = 0; i < resultFeed.getEntries().size(); i++) {
 			Entry entry = resultFeed.getEntries().get(i);
-			
+
 			Blog blog = new Blog();
 			blog.setName(entry.getTitle().getPlainText());
 			blog.setId(entry.getId().split("blog-")[1]);
-			
+
 			rez.add(blog);
 		}
-		
+
 		return rez;
 	}
 
@@ -143,6 +138,85 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			return entry.getId().split("blog-")[1];
 		}
 		throw new IOException("User has no blogs!");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.providers.IBlogProvider#loadListOfPosts(ua.jdesktopblogger
+	 * .domain.Account, ua.jdesktopblogger.domain.Blog)
+	 */
+	@Override
+	public Set<Post> loadListOfPosts(Account account, Blog blog)
+			throws BlogServiceException, IllegalArgumentException {
+
+		if (account.getProviderObject() == null) {
+			login(account);
+		}
+
+		if ((blog.getId() == null) || (blog.getId().isEmpty())) {
+			throw new IllegalArgumentException("Blog id is not valid");
+		}
+
+		URL feedUrl;
+		try {
+			feedUrl = new URL(FEED_URI_BASE + "/" + blog.getId()
+					+ POSTS_FEED_URI_SUFFIX);
+		} catch (MalformedURLException e1) {
+			throw new BlogServiceException(e1);
+		}
+
+		Feed resultFeed = getFeedFromAccount(account, feedUrl);
+		
+		Set<Post> rez = new TreeSet<Post>();
+
+		// Print the results
+		for (int i = 0; i < resultFeed.getEntries().size(); i++) {
+			Entry entry = resultFeed.getEntries().get(i);
+			Post post = new Post();
+			post.setTitle(entry.getTitle().getPlainText());
+			post.setBody(entry.getContent().toString());
+			
+			post.setEditDate(Calendar.getInstance());
+			post.getEditDate().setTimeInMillis(entry.getEdited().getValue());
+			
+			post.setEditDate(Calendar.getInstance());
+			post.getEditDate().setTimeInMillis(entry.getPublished().getValue());
+			
+			post.setDraft(entry.isDraft());
+			
+			post.setKeywords(entry.getEtag());
+			
+			post.setUrl(entry.getHtmlLink().getHref());
+			
+			rez.add(post);
+		}
+		return rez;
+	}
+
+	/**
+	 * Getting feed using blogger service from account
+	 * 
+	 * @param account
+	 *            Account where blogger service is stored
+	 * @param feedUrl
+	 *            Feed url to get
+	 * @return Feed of the account
+	 * @throws BlogServiceException
+	 *             If error occurs
+	 */
+	private Feed getFeedFromAccount(Account account, URL feedUrl)
+			throws BlogServiceException {
+		BloggerService myService = (BloggerService) account.getProviderObject();
+
+		Feed resultFeed;
+		try {
+			resultFeed = myService.getFeed(feedUrl, Feed.class);
+		} catch (Exception e) {
+			throw new BlogServiceException(e);
+		}
+		return resultFeed;
 	}
 
 }
