@@ -473,6 +473,8 @@ public class MainForm implements IAccountListener {
 				} else if (value instanceof Blog) {
 					Blog blog = (Blog) value;
 					return blog.getName();
+				} else if (value instanceof String){
+					return (String)value;
 				}
 				return "";
 			}
