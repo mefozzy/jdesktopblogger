@@ -21,4 +21,6 @@ public abstract class ServiceFactory {
 	
 	public abstract IAccountService getAccountService();
 	
+	public abstract IBlogService getBlogService();
+	
 }
