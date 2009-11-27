@@ -74,6 +74,8 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			Blog blog = new Blog();
 			blog.setName(entry.getTitle().getPlainText());
 			blog.setId(entry.getId().split("blog-")[1]);
+			
+			rez.add(blog);
 		}
 		
 		return rez;
