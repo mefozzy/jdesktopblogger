@@ -386,7 +386,7 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		scrollPane = new JScrollPane();
 		splitPaneLeftRight.setRightComponent(scrollPane);
-
+		scrollPane.setPreferredSize(new Dimension(700, 300));
 		createBlogsTable(scrollPane);
 
 		contentPane.add(createStatusBar(), BorderLayout.SOUTH);
@@ -425,33 +425,42 @@ public class MainForm implements IAccountListener, IPostListener {
 		
 		// Setting column name props
 		col = tableBlogs.getColumnModel().getColumn(
-				TablePostModel.ACCOUNT_COLUMN_NAME);
+				TablePostModel.POST_COLUMN_NAME);
 		DefaultTableCellRenderer namesRenderer = new DefaultTableCellRenderer();
 		//namesRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(namesRenderer);
 
 		// Setting column num props
 		col = tableBlogs.getColumnModel().getColumn(
-				TablePostModel.ACCOUNT_COLUMN_NUM);
+				TablePostModel.POST_COLUMN_NUM);
 		col.setMaxWidth(100);
 		col.setPreferredWidth(50);
 		DefaultTableCellRenderer numRenderer = new DefaultTableCellRenderer();
 		col.setCellRenderer(numRenderer);
 		
+		// Setting column num props
+		col = tableBlogs.getColumnModel().getColumn(
+				TablePostModel.POST_COLUMN_IS_DRAFT);
+		col.setMaxWidth(50);
+		col.setPreferredWidth(20);
+		DefaultTableCellRenderer boolRenderer = new DefaultTableCellRenderer();
+//		BooleanCellRenderer boolRenderer = new BooleanCellRenderer();
+		col.setCellRenderer(boolRenderer);
+		
 		// Setting column edited date props
 		col = tableBlogs.getColumnModel().getColumn(
-				TablePostModel.ACCOUNT_COLUMN_DATE_EDITED);
-		col.setMaxWidth(100);
-		col.setPreferredWidth(70);
+				TablePostModel.POST_COLUMN_DATE_EDITED);
+		col.setMaxWidth(170);
+		col.setPreferredWidth(150);
 		DateRenderer dateEditRenderer = new DateRenderer();
 		dateEditRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(dateEditRenderer);
 
 		// Setting column published date props
 		col = tableBlogs.getColumnModel().getColumn(
-				TablePostModel.ACCOUNT_COLUMN_DATE_PUBLISHED);
-		col.setMaxWidth(100);
-		col.setPreferredWidth(70);
+				TablePostModel.POST_COLUMN_DATE_PUBLISHED);
+		col.setMaxWidth(170);
+		col.setPreferredWidth(150);
 		DateRenderer datePublishRenderer = new DateRenderer();
 		datePublishRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(datePublishRenderer);
