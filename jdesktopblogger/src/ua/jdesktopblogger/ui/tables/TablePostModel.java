@@ -1,7 +1,6 @@
 package ua.jdesktopblogger.ui.tables;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -24,8 +23,9 @@ public class TablePostModel extends AbstractTableModel {
 	
 	private final String[] names = {
 			"Num",
-			"Name", //$NON-NLS-1$  
-			"Date" //$NON-NLS-1$
+			"Name",  
+			"Date Publish",  
+			"Date Edit"
 	}; 
 	
 	public TablePostModel(MainForm mainForm){
@@ -43,7 +43,7 @@ public class TablePostModel extends AbstractTableModel {
 	}
 
 	public int getColumnCount() {
-		return 3;
+		return 4;
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
