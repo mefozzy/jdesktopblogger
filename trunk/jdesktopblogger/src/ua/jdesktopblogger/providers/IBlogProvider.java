@@ -1,6 +1,7 @@
 package ua.jdesktopblogger.providers;
 
 import java.util.Set;
+import java.util.SortedSet;
 
 import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
@@ -62,7 +63,7 @@ public interface IBlogProvider {
 	 *             If error occurs
 	 * @throws IllegalArgumentException If blog is not valid
 	 */
-	public Set<Post> loadListOfPosts(Account account, Blog blog)
+	public SortedSet<Post> loadListOfPosts(Account account, Blog blog)
 			throws BlogServiceException, IllegalArgumentException;
 
 }
