@@ -1,6 +1,5 @@
 package ua.jdesktopblogger.providers.blogger;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
@@ -19,7 +18,6 @@ import com.google.gdata.client.blogger.BloggerService;
 import com.google.gdata.data.Entry;
 import com.google.gdata.data.Feed;
 import com.google.gdata.util.AuthenticationException;
-import com.google.gdata.util.ServiceException;
 
 /**
  * Provider that works with
@@ -34,8 +32,6 @@ public class GoogleBloggerProvider implements IBlogProvider {
 	private static final String FEED_URI_BASE = "http://www.blogger.com/feeds";
 	private static final String POSTS_FEED_URI_SUFFIX = "/posts/default";
 	private static final String COMMENTS_FEED_URI_SUFFIX = "/comments/default";
-
-	private static String feedUri;
 
 	/*
 	 * (non-Javadoc)
@@ -104,41 +100,8 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			throw new AccountAuthenticateException(account.getLogin(),
 					"http://www.blogger.com/");
 		}
-		// Get the blog ID from the metatfeed.
-		String blogId;
-		try {
-			blogId = getBlogId(myService);
-		} catch (Exception e) {
-			throw new BlogServiceException(e);
-		}
 
 		account.setProviderObject(myService);
-	}
-
-	/**
-	 * Parses the metafeed to get the blog ID for the authenticated user's
-	 * default blog.
-	 * 
-	 * @param myService
-	 *            An authenticated GoogleService object.
-	 * @return A String representation of the blog's ID.
-	 * @throws ServiceException
-	 *             If the service is unable to handle the request.
-	 * @throws IOException
-	 *             If the URL is malformed.
-	 */
-	private static String getBlogId(BloggerService myService)
-			throws ServiceException, IOException {
-		// Get the metafeed
-		final URL feedUrl = new URL(METAFEED_URL);
-		Feed resultFeed = myService.getFeed(feedUrl, Feed.class);
-
-		// If the user has a blog then return the id (which comes after 'blog-')
-		if (resultFeed.getEntries().size() > 0) {
-			Entry entry = resultFeed.getEntries().get(0);
-			return entry.getId().split("blog-")[1];
-		}
-		throw new IOException("User has no blogs!");
 	}
 
 	/*
