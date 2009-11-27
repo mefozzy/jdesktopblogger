@@ -33,10 +33,12 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
-import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.tree.TreePath;
 
 import ua.cn.yet.common.ui.popup.PopupFactory;
@@ -48,7 +50,10 @@ import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
 import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
+import ua.jdesktopblogger.ui.renderers.DateRenderer;
 import ua.jdesktopblogger.ui.renderers.TreeCellAccountRenderer;
+import ua.jdesktopblogger.ui.tables.TableMessageModel;
+import ua.jdesktopblogger.ui.tables.TableSorterWithoutZeroColumn;
 
 public class MainForm implements IAccountListener {
 
@@ -71,7 +76,7 @@ public class MainForm implements IAccountListener {
 
 	private JTextArea textAreaLog;
 
-	private JTable tableAccounts;
+	private JTable tableBlogs;
 
 	private JTable tableEmails;
 
@@ -90,6 +95,8 @@ public class MainForm implements IAccountListener {
 	private JTree treeBlogs;
 
 	private BlogsTreeDataModel treeModelBlogs;
+	
+	private TableMessageModel tableMsgsModel;
 
 	// //////////////////////////////////////////////////////////////////////////////////
 
@@ -374,14 +381,69 @@ public class MainForm implements IAccountListener {
 
 		createAccountsTree(scrollPane);
 
-		// scrollPane = new JScrollPane();
-		// splitPaneLeftRight.setRightComponent(scrollPane);
+		scrollPane = new JScrollPane();
+		splitPaneLeftRight.setRightComponent(scrollPane);
 
-		// createMailsTable(scrollPane);
+		createBlogsTable(scrollPane);
 
 		contentPane.add(createStatusBar(), BorderLayout.SOUTH);
 
 		createToolBar(contentPane);
+	}
+
+	private void createBlogsTable(JScrollPane scrollPane) {
+		tableMsgsModel = new TableMessageModel();
+		TableSorterWithoutZeroColumn sorter = 
+			new TableSorterWithoutZeroColumn(tableMsgsModel);
+		
+		tableBlogs = new JTable(sorter);
+		sorter.setTableHeader(tableBlogs.getTableHeader());
+		tableBlogs.setName("tableMsgs");
+		
+		assignRendererForColumnsInBlogsTable();
+		
+		tableBlogs.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(final MouseEvent e){
+				if (e.getButton() == MouseEvent.BUTTON1 &&
+						e.getClickCount() > 1){
+					System.out.println("user selected row in the table");
+				}
+			}
+		});
+		scrollPane.setViewportView(tableBlogs);
+	}
+
+	private void assignRendererForColumnsInBlogsTable() {
+		TableColumn col;
+		
+		// Setting table props
+		tableBlogs.setRowSelectionAllowed(true);
+		tableBlogs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		// Setting column name props
+		col = tableBlogs.getColumnModel().getColumn(
+				TableMessageModel.ACCOUNT_COLUMN_NAME);
+		DefaultTableCellRenderer namesRenderer = new DefaultTableCellRenderer();
+		//namesRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		col.setCellRenderer(namesRenderer);
+
+		// Setting column num props
+		col = tableBlogs.getColumnModel().getColumn(
+				TableMessageModel.ACCOUNT_COLUMN_NUM);
+		col.setMaxWidth(100);
+		col.setPreferredWidth(50);
+		DefaultTableCellRenderer numRenderer = new DefaultTableCellRenderer();
+		col.setCellRenderer(numRenderer);
+		
+		// Setting column emails props
+		col = tableBlogs.getColumnModel().getColumn(
+				TableMessageModel.ACCOUNT_COLUMN_DATE);
+		col.setMaxWidth(100);
+		col.setPreferredWidth(70);
+		DateRenderer dateRenderer = new DateRenderer();
+		dateRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		col.setCellRenderer(dateRenderer);
+		
 	}
 
 	/**
