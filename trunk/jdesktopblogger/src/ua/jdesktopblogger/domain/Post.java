@@ -33,6 +33,9 @@ public class Post implements Comparable<Post> {
 	
 	/** Specifies, if blog is uploaded to server */
 	private boolean uploaded;
+	
+	/** Url of the post */
+	private String url;
 
 	/**
 	 * @return the title
@@ -139,6 +142,20 @@ public class Post implements Comparable<Post> {
 	 */
 	public void setEditDate(Calendar editDate) {
 		this.editDate = editDate;
+	}
+
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
+	}
+
+	/**
+	 * @param url the url to set
+	 */
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 }
