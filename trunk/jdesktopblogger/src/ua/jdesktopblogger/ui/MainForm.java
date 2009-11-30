@@ -44,6 +44,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.tree.TreePath;
@@ -589,6 +590,10 @@ public class MainForm implements IAccountListener, IPostListener {
 						.createTitledBorder(""), BorderFactory
 						.createEmptyBorder(0, 0, 0, 0)), areaLogScrollPane
 						.getBorder()));
+		
+		HyperlinkListener hyperlinkListener = new ActivatedHyperlinkListener();
+		textPanePost.addHyperlinkListener(hyperlinkListener);
+		    
 		panel.add(panelInfoPost, BorderLayout.NORTH);
 		panel.add(areaLogScrollPane, BorderLayout.CENTER);
 		return panel;
