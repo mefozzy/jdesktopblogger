@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
@@ -84,7 +85,7 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private JSplitPane splitPaneLeftRight;
 
-	private JEditorPane editorPanePost;
+	private JTextPane textPanePost;
 
 	private JTable tablePosts;
 
@@ -425,8 +426,8 @@ public class MainForm implements IAccountListener, IPostListener {
 				if (e.getButton() == MouseEvent.BUTTON1){
 					// getting selected post and load its content to the editorPane
 					Post post = MainForm.this.getSelectedPost();
-					MainForm.this.editorPanePost.setText(post.getBody());
-					MainForm.this.editorPanePost.setCaretPosition(0);
+					MainForm.this.textPanePost.setText(post.getBody());
+					MainForm.this.textPanePost.setCaretPosition(0);
 					MainForm.this.labelPostName.setText(post.getTitle());
 
 					// format dates of the post
@@ -572,12 +573,12 @@ public class MainForm implements IAccountListener, IPostListener {
 		panelInfoPost.setVisible(false);
 		
 		// adding editor pane to output post body
-		editorPanePost = new JEditorPane();
-		editorPanePost.setEditable(false);
-		editorPanePost.setContentType("text/html");
-		editorPanePost.setBackground(Color.WHITE);
+		textPanePost = new JTextPane();
+		textPanePost.setEditable(false);
+		textPanePost.setContentType("text/html");
+		textPanePost.setBackground(Color.WHITE);
 
-		JScrollPane areaLogScrollPane = new JScrollPane(editorPanePost);
+		JScrollPane areaLogScrollPane = new JScrollPane(textPanePost);
 		areaLogScrollPane.setPreferredSize(new Dimension(700, 300));
 		areaLogScrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -685,16 +686,16 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	public synchronized void addLog(String message) {
 		Calendar now = Calendar.getInstance();
-		if (editorPanePost.getText().equals("")) //$NON-NLS-1$
-			editorPanePost.setText(String.format("%tT", now) //$NON-NLS-1$
+		if (textPanePost.getText().equals("")) //$NON-NLS-1$
+			textPanePost.setText(String.format("%tT", now) //$NON-NLS-1$
 					+ ": " //$NON-NLS-1$
 					+ message);
 		else
-			editorPanePost.setText(editorPanePost.getText() + Messages.NEW_LINE
+			textPanePost.setText(textPanePost.getText() + Messages.NEW_LINE
 					+ String.format("%tT", now) //$NON-NLS-1$
 					+ ": " //$NON-NLS-1$
 					+ message);
-		editorPanePost.setSelectionStart(editorPanePost.getText().length() - 1);
+		textPanePost.setSelectionStart(textPanePost.getText().length() - 1);
 	}
 
 	/**
@@ -703,7 +704,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * @return log information
 	 */
 	public String getLogText() {
-		return editorPanePost.getText();
+		return textPanePost.getText();
 	}
 
 	/**
