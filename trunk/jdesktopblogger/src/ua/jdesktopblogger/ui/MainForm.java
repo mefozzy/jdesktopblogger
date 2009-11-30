@@ -8,6 +8,7 @@ import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
@@ -17,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 
@@ -105,7 +107,16 @@ public class MainForm implements IAccountListener, IPostListener {
 	private BlogsTreeDataModel treeModelBlogs;
 	
 	private TablePostModel tablePostModel;
+	
+	private JLabel labelPostName;
 
+	private JLabel labelPostDatePublish;
+
+	private JLabel labelPostDateEdit;
+
+	private JLabel labelPostKeywords;
+	
+	private JPanel panelInfoPost; 
 	// //////////////////////////////////////////////////////////////////////////////////
 
 	private AccountEditAction accountEditAction;
@@ -415,6 +426,18 @@ public class MainForm implements IAccountListener, IPostListener {
 					// getting selected post and load its content to the editorPane
 					Post post = MainForm.this.getSelectedPost();
 					MainForm.this.editorPanePost.setText(post.getBody());
+					MainForm.this.editorPanePost.setCaretPosition(0);
+					MainForm.this.labelPostName.setText(post.getTitle());
+
+					// format dates of the post
+					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+					
+					MainForm.this.labelPostDateEdit.setText(df.format(post.getPublishDate().getTime()));
+					MainForm.this.labelPostDatePublish.setText(df.format(post.getEditDate().getTime()));
+//					MainForm.this.labelPostKeywords.setText(post.getKeywords().toString());
+					
+					// show the panel with post's information
+					MainForm.this.panelInfoPost.setVisible(true);
 				}
 			}
 		});
@@ -528,7 +551,27 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private JComponent createEntryViewArea() {
 		JPanel panel = new JPanel(new BorderLayout());
+		// adding panel with blog info
+		panelInfoPost = new JPanel(new BorderLayout());
+		labelPostName = new JLabel();
+		labelPostName.setFont(new Font("Serif", Font.BOLD, 16));
+		panelInfoPost.add(labelPostName, BorderLayout.NORTH);
+		
+		// adding panel to output information about post dates (publish and edit)
+		JPanel panelForPostDates = new JPanel(new FlowLayout());
+		labelPostDateEdit = new JLabel();
+		panelForPostDates.add(new JLabel("Edit date:"));
+		panelForPostDates.add(labelPostDateEdit);
+		panelForPostDates.add(new JLabel("Publish date:"));
+		labelPostDatePublish = new JLabel();
+		panelForPostDates.add(labelPostDatePublish);
+		panelInfoPost.add(panelForPostDates, BorderLayout.WEST);
 
+//		labelPostKeywords = new JLabel();
+//		panelInfoPost.add(labelPostKeywords	, BorderLayout.SOUTH);
+		panelInfoPost.setVisible(false);
+		
+		// adding editor pane to output post body
 		editorPanePost = new JEditorPane();
 		editorPanePost.setEditable(false);
 		editorPanePost.setContentType("text/html");
@@ -543,7 +586,8 @@ public class MainForm implements IAccountListener, IPostListener {
 						.createTitledBorder(""), BorderFactory
 						.createEmptyBorder(0, 0, 0, 0)), areaLogScrollPane
 						.getBorder()));
-		panel.add(areaLogScrollPane);
+		panel.add(panelInfoPost, BorderLayout.NORTH);
+		panel.add(areaLogScrollPane, BorderLayout.CENTER);
 		return panel;
 	}
 
