@@ -14,6 +14,7 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -59,6 +60,7 @@ import ua.jdesktopblogger.excetions.AccountIOException;
 import ua.jdesktopblogger.services.ServiceFactory;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
+import ua.jdesktopblogger.ui.actions.PostNewAction;
 import ua.jdesktopblogger.ui.actions.PostsLoadAction;
 import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
 import ua.jdesktopblogger.ui.renderers.DateRenderer;
@@ -123,6 +125,8 @@ public class MainForm implements IAccountListener, IPostListener {
 	private AccountEditAction accountEditAction;
 	private AccountRefreshAction accountRefreshAction;	
 	private PostsLoadAction postsLoadAction;
+	
+	private PostNewAction postNewAction;
 
 
 	/**
@@ -338,22 +342,12 @@ public class MainForm implements IAccountListener, IPostListener {
 	 *            Frame
 	 */
 	private void createActions(JFrame fr) {
-		// fileSaveAction = new FileSaveAction(this);
-		// fileSaveAsAction = new FileSaveAsAction(this);
-		// fileExitAction = new FileExitAction(this, fileSaveAction);
-		// fileNewAction = new FileNewAction(this, fileSaveAction);
-		// fileOpenAction = new FileOpenAction(this, fileSaveAction);
-		//		
-		// viewShowOldEmailsAction = new ViewShowOldEmailsAction(this);
-		// viewSelectAllEmailsAction = new ViewSelectAllEmailsAction(this);
-		// viewSelectAllEmailsButLastAction = new
-		// ViewSelectAllEmailsButLastAction(this);
-		// viewShowHideAppAction = new ViewShowHideAppAction(this);
-		//
 		accountEditAction = new AccountEditAction(this);
 		accountRefreshAction = new AccountRefreshAction(this);
 		
 		postsLoadAction = new PostsLoadAction(this);
+		
+		postNewAction = new PostNewAction(this);
 		
 		// helpAboutAction = new HelpAboutAction(this);
 	}
@@ -520,6 +514,10 @@ public class MainForm implements IAccountListener, IPostListener {
 		button = new JButton(postsLoadAction);
 		button.setText(null);
 		toolBar.add(button);
+		
+		button = new JButton(postNewAction);
+		button.setText(null);
+		toolBar.add(button);
 	}
 
 	/**
@@ -572,11 +570,15 @@ public class MainForm implements IAccountListener, IPostListener {
 //		panelInfoPost.add(labelPostKeywords	, BorderLayout.SOUTH);
 		panelInfoPost.setVisible(false);
 		
+		MouseListener popupListener = new PopupListener(PopupFactory
+				.getEditPopup());
+		
 		// adding editor pane to output post body
 		textPanePost = new JTextPane();
 		textPanePost.setEditable(false);
 		textPanePost.setContentType("text/html");
 		textPanePost.setBackground(Color.WHITE);
+		textPanePost.addMouseListener(popupListener);
 
 		JScrollPane areaLogScrollPane = new JScrollPane(textPanePost);
 		areaLogScrollPane.setPreferredSize(new Dimension(700, 300));
@@ -752,8 +754,6 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	@Override
 	public void accountRefreshed(Account account) {
-		System.out.println("Refreshed!");
-		
 		treeBlogs.updateUI();
 		
 		postsLoadAction.setEnabled(true);
