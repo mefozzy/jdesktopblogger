@@ -13,6 +13,8 @@ public class TablePostModel extends AbstractTableModel {
 
 	private MainForm mainForm;
 	
+	public static final int POST_COLUMN_WHOLE_POST = 5;
+	
 	public static final int POST_COLUMN_DATE_EDITED = 4;
 	
 	public static final int POST_COLUMN_DATE_PUBLISHED = 3;
@@ -65,6 +67,8 @@ public class TablePostModel extends AbstractTableModel {
 				return post.getPublishDate();
 			case POST_COLUMN_DATE_EDITED:
 				return post.getEditDate();
+			case POST_COLUMN_WHOLE_POST:
+				return post;
 			}
 		}
 		return ""; //$NON-NLS-1$

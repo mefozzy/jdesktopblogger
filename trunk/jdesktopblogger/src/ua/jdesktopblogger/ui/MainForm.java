@@ -2,6 +2,7 @@ package ua.jdesktopblogger.ui;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -531,6 +532,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		editorPanePost = new JEditorPane();
 		editorPanePost.setEditable(false);
 		editorPanePost.setContentType("text/html");
+		editorPanePost.setBackground(Color.WHITE);
 
 		JScrollPane areaLogScrollPane = new JScrollPane(editorPanePost);
 		areaLogScrollPane.setPreferredSize(new Dimension(700, 300));
@@ -747,7 +749,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	public Post getSelectedPost(){
 		int iSelPost = tablePosts.getSelectedRow();
-		return tablePostModel.getPost(iSelPost);
+		return (Post)tablePosts.getModel().getValueAt(iSelPost, TablePostModel.POST_COLUMN_WHOLE_POST);
 	}
 	
 	/* (non-Javadoc)
