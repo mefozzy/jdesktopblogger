@@ -23,6 +23,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -49,6 +50,7 @@ import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.domain.IPostListener;
+import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.AccountIOException;
 import ua.jdesktopblogger.services.ServiceFactory;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
@@ -79,9 +81,9 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private JSplitPane splitPaneLeftRight;
 
-	private JTextArea textAreaLog;
+	private JEditorPane editorPanePost;
 
-	private JTable tableBlogs;
+	private JTable tablePosts;
 
 	private JTable tableEmails;
 
@@ -400,39 +402,40 @@ public class MainForm implements IAccountListener, IPostListener {
 			new TableSorterWithoutZeroColumn(tablePostModel);
 		sorter.setSortingStatus(3, TableSorterWithoutZeroColumn.DESCENDING);
 		
-		tableBlogs = new JTable(sorter);
-		sorter.setTableHeader(tableBlogs.getTableHeader());
-		tableBlogs.setName("tableMsgs");
+		tablePosts = new JTable(sorter);
+		sorter.setTableHeader(tablePosts.getTableHeader());
+		tablePosts.setName("tableMsgs");
 		
 		assignRendererForColumnsInBlogsTable();
 		
-		tableBlogs.addMouseListener(new MouseAdapter(){
+		tablePosts.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(final MouseEvent e){
-				if (e.getButton() == MouseEvent.BUTTON1 &&
-						e.getClickCount() > 1){
-					System.out.println("user selected row in the table");
+				if (e.getButton() == MouseEvent.BUTTON1){
+					// getting selected post and load its content to the editorPane
+					Post post = MainForm.this.getSelectedPost();
+					MainForm.this.editorPanePost.setText(post.getBody());
 				}
 			}
 		});
-		scrollPane.setViewportView(tableBlogs);
+		scrollPane.setViewportView(tablePosts);
 	}
 
 	private void assignRendererForColumnsInBlogsTable() {
 		TableColumn col;
 		
 		// Setting table props
-		tableBlogs.setRowSelectionAllowed(true);
-		tableBlogs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tablePosts.setRowSelectionAllowed(true);
+		tablePosts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		// Setting column name props
-		col = tableBlogs.getColumnModel().getColumn(
+		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_NAME);
 		DefaultTableCellRenderer namesRenderer = new DefaultTableCellRenderer();
 		//namesRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(namesRenderer);
 
 		// Setting column num props
-		col = tableBlogs.getColumnModel().getColumn(
+		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_NUM);
 		col.setMaxWidth(100);
 		col.setPreferredWidth(50);
@@ -440,7 +443,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setCellRenderer(numRenderer);
 		
 		// Setting column num props
-		col = tableBlogs.getColumnModel().getColumn(
+		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_IS_DRAFT);
 		col.setMaxWidth(50);
 		col.setPreferredWidth(20);
@@ -449,7 +452,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setCellRenderer(boolRenderer);
 		
 		// Setting column edited date props
-		col = tableBlogs.getColumnModel().getColumn(
+		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_DATE_EDITED);
 		col.setMaxWidth(170);
 		col.setPreferredWidth(150);
@@ -458,7 +461,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setCellRenderer(dateEditRenderer);
 
 		// Setting column published date props
-		col = tableBlogs.getColumnModel().getColumn(
+		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_DATE_PUBLISHED);
 		col.setMaxWidth(170);
 		col.setPreferredWidth(150);
@@ -525,19 +528,17 @@ public class MainForm implements IAccountListener, IPostListener {
 	private JComponent createEntryViewArea() {
 		JPanel panel = new JPanel(new BorderLayout());
 
-		textAreaLog = new JTextArea();
-		textAreaLog.setEditable(false);
-		textAreaLog.setLineWrap(true);
-		textAreaLog.setWrapStyleWord(true);
-		textAreaLog.addMouseListener(new PopupListener(PopupFactory
-				.getGeneralPopup(PopupFactory.getEditPopup())));
+		editorPanePost = new JEditorPane();
+		editorPanePost.setEditable(false);
+		editorPanePost.setContentType("text/html");
 
-		JScrollPane areaLogScrollPane = new JScrollPane(textAreaLog);
+		JScrollPane areaLogScrollPane = new JScrollPane(editorPanePost);
+		areaLogScrollPane.setPreferredSize(new Dimension(700, 300));
 		areaLogScrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		areaLogScrollPane.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(BorderFactory
-						.createTitledBorder("Log"), BorderFactory
+						.createTitledBorder(""), BorderFactory
 						.createEmptyBorder(0, 0, 0, 0)), areaLogScrollPane
 						.getBorder()));
 		panel.add(areaLogScrollPane);
@@ -638,16 +639,16 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	public synchronized void addLog(String message) {
 		Calendar now = Calendar.getInstance();
-		if (textAreaLog.getText().equals("")) //$NON-NLS-1$
-			textAreaLog.setText(String.format("%tT", now) //$NON-NLS-1$
+		if (editorPanePost.getText().equals("")) //$NON-NLS-1$
+			editorPanePost.setText(String.format("%tT", now) //$NON-NLS-1$
 					+ ": " //$NON-NLS-1$
 					+ message);
 		else
-			textAreaLog.setText(textAreaLog.getText() + Messages.NEW_LINE
+			editorPanePost.setText(editorPanePost.getText() + Messages.NEW_LINE
 					+ String.format("%tT", now) //$NON-NLS-1$
 					+ ": " //$NON-NLS-1$
 					+ message);
-		textAreaLog.setSelectionStart(textAreaLog.getText().length() - 1);
+		editorPanePost.setSelectionStart(editorPanePost.getText().length() - 1);
 	}
 
 	/**
@@ -656,7 +657,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * @return log information
 	 */
 	public String getLogText() {
-		return textAreaLog.getText();
+		return editorPanePost.getText();
 	}
 
 	/**
@@ -739,6 +740,16 @@ public class MainForm implements IAccountListener, IPostListener {
 		}
 	}
 
+	/**
+	 * Getting selected post from the table
+	 * 
+	 * @return Selected post or <code>null</code>
+	 */
+	public Post getSelectedPost(){
+		int iSelPost = tablePosts.getSelectedRow();
+		return tablePostModel.getPost(iSelPost);
+	}
+	
 	/* (non-Javadoc)
 	 * @see ua.jdesktopblogger.domain.IPostListener#postsLoaded(ua.jdesktopblogger.domain.Blog)
 	 */
