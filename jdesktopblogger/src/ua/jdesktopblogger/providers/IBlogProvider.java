@@ -79,12 +79,13 @@ public interface IBlogProvider {
 	 *            Blog to publish to
 	 * @param newPost
 	 *            New post
+	 * @return Published post object
 	 * @throws BlogServiceException
 	 *             If error occurs
 	 * @throws IllegalArgumentException
 	 *             If blog is not valid
 	 */
-	public void publishNewPost(Account account, Blog blog, Post newPost)
+	public Post publishNewPost(Account account, Blog blog, Post newPost)
 			throws BlogServiceException, ProviderIOException,
 			IllegalArgumentException;
 
