@@ -232,7 +232,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 	 * ua.jdesktopblogger.domain.Post)
 	 */
 	@Override
-	public void publishNewPost(Account account, Blog blog, Post newPost)
+	public Post publishNewPost(Account account, Blog blog, Post newPost)
 			throws BlogServiceException, ProviderIOException,
 			IllegalArgumentException {
 
@@ -256,6 +256,8 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			publishedPost.setUploaded(true);
 			
 			blog.getPosts().add(publishedPost);
+			
+			return publishedPost;
 		} catch (IOException e) {
 			throw new ProviderIOException(e);
 		} catch (ServiceException e) {
