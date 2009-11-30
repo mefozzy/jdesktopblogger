@@ -1,5 +1,6 @@
 package ua.jdesktopblogger.providers.blogger;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
@@ -12,13 +13,16 @@ import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.AccountAuthenticateException;
 import ua.jdesktopblogger.excetions.BlogServiceException;
+import ua.jdesktopblogger.excetions.ProviderIOException;
 import ua.jdesktopblogger.providers.IBlogProvider;
 
 import com.google.gdata.client.blogger.BloggerService;
 import com.google.gdata.data.Entry;
 import com.google.gdata.data.Feed;
 import com.google.gdata.data.HtmlTextConstruct;
+import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.util.AuthenticationException;
+import com.google.gdata.util.ServiceException;
 
 /**
  * Provider that works with
@@ -32,7 +36,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 
 	private static final String FEED_URI_BASE = "http://www.blogger.com/feeds";
 	private static final String POSTS_FEED_URI_SUFFIX = "/posts/default";
-	private static final String COMMENTS_FEED_URI_SUFFIX = "/comments/default";
+	//private static final String COMMENTS_FEED_URI_SUFFIX = "/comments/default";
 
 	/*
 	 * (non-Javadoc)
@@ -43,7 +47,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 	 */
 	@Override
 	public Set<Blog> loadListOfBlogs(Account account)
-			throws BlogServiceException {
+			throws BlogServiceException, ProviderIOException {
 
 		if (account.getProviderObject() == null) {
 			login(account);
@@ -114,16 +118,74 @@ public class GoogleBloggerProvider implements IBlogProvider {
 	 */
 	@Override
 	public SortedSet<Post> loadListOfPosts(Account account, Blog blog)
-			throws BlogServiceException, IllegalArgumentException {
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException {
 
-		if (account.getProviderObject() == null) {
-			login(account);
+		checkAccountAndBlogForValidity(account, blog);
+
+		URL feedUrl = constructFeedUrlForBlog(blog);
+
+		Feed resultFeed = getFeedFromAccount(account, feedUrl);
+
+		SortedSet<Post> rez = new TreeSet<Post>();
+
+		// Print the results
+		for (int i = 0; i < resultFeed.getEntries().size(); i++) {
+			Entry entry = resultFeed.getEntries().get(i);
+			Post post = constructPostFromEntry(entry);
+
+			rez.add(post);
+		}
+		return rez;
+	}
+
+	/**
+	 * Constructing new post object and filling information from entry
+	 * 
+	 * @param entry
+	 *            Entry to get information from
+	 * @return constructed post object
+	 */
+	private Post constructPostFromEntry(Entry entry) {
+		Post post = new Post();
+		post.setTitle(entry.getTitle().getPlainText());
+
+		if (entry.getTextContent().getContent() instanceof HtmlTextConstruct) {
+			post.setBody(((HtmlTextConstruct) entry.getTextContent()
+					.getContent()).getHtml());
+		} else {
+			post.setBody(entry.getTextContent().getContent().getPlainText());
 		}
 
-		if ((blog.getId() == null) || (blog.getId().isEmpty())) {
-			throw new IllegalArgumentException("Blog id is not valid");
-		}
+		post.setEditDate(Calendar.getInstance());
+		post.getEditDate().setTimeInMillis(entry.getEdited().getValue());
 
+		post.setPublishDate(Calendar.getInstance());
+		post.getPublishDate().setTimeInMillis(entry.getPublished().getValue());
+
+		post.setDraft(entry.isDraft());
+
+		// post.setKeywords(entry.getEtag());
+		post.setUploaded(true);
+
+		if (entry.getHtmlLink() != null) {
+			post.setUrl(entry.getHtmlLink().getHref());
+		} else {
+			post.setUrl(entry.getEditLink().getHref());
+		}
+		return post;
+	}
+
+	/**
+	 * Constructing feed url for the specified blog
+	 * 
+	 * @param blog
+	 *            Blog to use
+	 * @return constructed url
+	 * @throws BlogServiceException
+	 *             If construction fails
+	 */
+	private URL constructFeedUrlForBlog(Blog blog) throws BlogServiceException {
 		URL feedUrl;
 		try {
 			feedUrl = new URL(FEED_URI_BASE + "/" + blog.getId()
@@ -131,42 +193,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 		} catch (MalformedURLException e1) {
 			throw new BlogServiceException(e1);
 		}
-
-		Feed resultFeed = getFeedFromAccount(account, feedUrl);
-		
-		SortedSet<Post> rez = new TreeSet<Post>();
-
-		// Print the results
-		for (int i = 0; i < resultFeed.getEntries().size(); i++) {
-			Entry entry = resultFeed.getEntries().get(i);
-			Post post = new Post();
-			post.setTitle(entry.getTitle().getPlainText());
-			
-			if (entry.getTextContent().getContent() instanceof HtmlTextConstruct) {
-				post.setBody(((HtmlTextConstruct)entry.getTextContent().getContent()).getHtml());
-			} else {
-				post.setBody(entry.getTextContent().getContent().getPlainText());
-			}
-			
-			post.setEditDate(Calendar.getInstance());
-			post.getEditDate().setTimeInMillis(entry.getEdited().getValue());
-			
-			post.setPublishDate(Calendar.getInstance());
-			post.getPublishDate().setTimeInMillis(entry.getPublished().getValue());
-			
-			post.setDraft(entry.isDraft());
-			
-			post.setKeywords(entry.getEtag());
-			
-			if (entry.getHtmlLink() != null) {
-				post.setUrl(entry.getHtmlLink().getHref());
-			} else {
-				post.setUrl(entry.getEditLink().getHref());
-			}
-			
-			rez.add(post);
-		}
-		return rez;
+		return feedUrl;
 	}
 
 	/**
@@ -181,16 +208,85 @@ public class GoogleBloggerProvider implements IBlogProvider {
 	 *             If error occurs
 	 */
 	private Feed getFeedFromAccount(Account account, URL feedUrl)
-			throws BlogServiceException {
+			throws BlogServiceException, ProviderIOException {
 		BloggerService myService = (BloggerService) account.getProviderObject();
 
 		Feed resultFeed;
 		try {
 			resultFeed = myService.getFeed(feedUrl, Feed.class);
-		} catch (Exception e) {
+		} catch (IOException e) {
+			throw new ProviderIOException(e);
+		} catch (ServiceException e) {
 			throw new BlogServiceException(e);
 		}
+
 		return resultFeed;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.providers.IBlogProvider#publishNewPost(ua.jdesktopblogger
+	 * .domain.Account, ua.jdesktopblogger.domain.Blog,
+	 * ua.jdesktopblogger.domain.Post)
+	 */
+	@Override
+	public void publishNewPost(Account account, Blog blog, Post newPost)
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException {
+
+		checkAccountAndBlogForValidity(account, blog);
+
+		// Create the entry to insert
+		Entry myEntry = new Entry();
+		myEntry.setTitle(new PlainTextConstruct(newPost.getTitle()));
+		myEntry.setContent(new PlainTextConstruct(newPost.getBody()));
+		myEntry.setDraft(newPost.isDraft());
+
+		// Ask the service to insert the new entry
+		URL postUrl = constructFeedUrlForBlog(blog);
+
+		BloggerService myService = (BloggerService) account.getProviderObject();
+
+		try {
+			Entry entry = myService.insert(postUrl, myEntry);
+			
+			Post publishedPost = constructPostFromEntry(entry);
+			publishedPost.setUploaded(true);
+			
+			blog.getPosts().add(publishedPost);
+		} catch (IOException e) {
+			throw new ProviderIOException(e);
+		} catch (ServiceException e) {
+			throw new BlogServiceException(e);
+		}
+	}
+
+	/**
+	 * Checking blog and account for validity
+	 * 
+	 * @param account
+	 *            Account to check
+	 * @param blog
+	 *            Blog to check
+	 * @throws BlogServiceException
+	 *             If if error occurs
+	 * @throws AccountAuthenticateException
+	 *             If login fails for not-logged on account
+	 * @throws IllegalArgumentException
+	 *             if blog is invalid
+	 */
+	private void checkAccountAndBlogForValidity(Account account, Blog blog)
+			throws BlogServiceException, AccountAuthenticateException,
+			IllegalArgumentException {
+		if (account.getProviderObject() == null) {
+			login(account);
+		}
+
+		if ((blog.getId() == null) || (blog.getId().isEmpty())) {
+			throw new IllegalArgumentException("Blog id is not valid");
+		}
 	}
 
 }
