@@ -65,6 +65,7 @@ import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
 import ua.jdesktopblogger.ui.actions.PostNewAction;
 import ua.jdesktopblogger.ui.actions.PostsLoadAction;
+import ua.jdesktopblogger.ui.actions.ViewShowHideAppAction;
 import ua.jdesktopblogger.ui.models.BlogsTreeDataModel;
 import ua.jdesktopblogger.ui.renderers.DateRenderer;
 import ua.jdesktopblogger.ui.renderers.TreeCellAccountRenderer;
@@ -130,6 +131,8 @@ public class MainForm implements IAccountListener, IPostListener {
 	private PostsLoadAction postsLoadAction;
 	
 	private PostNewAction postNewAction;
+
+	private ViewShowHideAppAction viewShowHideAppAction;
 
 
 	/**
@@ -233,21 +236,22 @@ public class MainForm implements IAccountListener, IPostListener {
 		if (SystemTray.isSupported()) {
 			SystemTray tray = SystemTray.getSystemTray();
 			trayIcon = new TrayIcon(
-					createImageIcon("images/prog16.png").getImage(), //$NON-NLS-1$ 
+					createImageIcon("images/jdesktopblogger24.png").getImage(), //$NON-NLS-1$ 
 					appTitle);
 
-			// trayIcon.setPopupMenu(PopupFactory.getGeneralPopupAwt(
-			// viewShowHideAppAction, null, emailCheckAllAction,
+			trayIcon.setPopupMenu(PopupFactory.getGeneralPopupAwt(
+					viewShowHideAppAction));
+			//, null, emailCheckAllAction,
 			// null, helpAboutAction, fileExitAction));
 
-			// trayIcon.setImageAutoSize(true);
+			trayIcon.setImageAutoSize(true);
 
 			trayIcon.addMouseListener(new MouseAdapter() {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					if ((e.getClickCount() > 1) && (e.getClickCount() < 3)) {
-						// viewShowHideAppAction.actionPerformed(null);
+						viewShowHideAppAction.actionPerformed(null);
 					}
 				}
 			});
@@ -352,6 +356,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		
 		postNewAction = new PostNewAction(this);
 		
+		viewShowHideAppAction = new ViewShowHideAppAction(this);
 		// helpAboutAction = new HelpAboutAction(this);
 	}
 
