@@ -18,6 +18,7 @@ public class PostNewAction extends SuperAction {
 				KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N,
 						ActionEvent.CTRL_MASK),
 				"Create new post", fr);
+		setEnabled(false);
 	}
 
 	public PostNewAction(String caption, ImageIcon icon, int keyEvent,
