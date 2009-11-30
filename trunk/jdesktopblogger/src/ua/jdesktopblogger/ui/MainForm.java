@@ -809,5 +809,13 @@ public class MainForm implements IAccountListener, IPostListener {
 	public void postsLoaded(Blog blog) {
 		tablePostModel.fireTableDataChanged();
 	}
+
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.domain.IPostListener#postPublished(ua.jdesktopblogger.domain.Blog, ua.jdesktopblogger.domain.Post)
+	 */
+	@Override
+	public void postPublished(Blog blog, Post publishedPost) {
+		tablePostModel.fireTableDataChanged();		
+	}
 	
 }
