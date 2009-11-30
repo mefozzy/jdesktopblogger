@@ -762,6 +762,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		treeBlogs.updateUI();
 		
 		postsLoadAction.setEnabled(true);
+		postNewAction.setEnabled(true);
 	}
 
 	/**
