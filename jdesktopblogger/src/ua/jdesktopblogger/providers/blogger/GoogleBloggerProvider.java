@@ -17,6 +17,7 @@ import ua.jdesktopblogger.providers.IBlogProvider;
 import com.google.gdata.client.blogger.BloggerService;
 import com.google.gdata.data.Entry;
 import com.google.gdata.data.Feed;
+import com.google.gdata.data.HtmlTextConstruct;
 import com.google.gdata.util.AuthenticationException;
 
 /**
@@ -140,7 +141,12 @@ public class GoogleBloggerProvider implements IBlogProvider {
 			Entry entry = resultFeed.getEntries().get(i);
 			Post post = new Post();
 			post.setTitle(entry.getTitle().getPlainText());
-			post.setBody(entry.getContent().toString());
+			
+			if (entry.getTextContent().getContent() instanceof HtmlTextConstruct) {
+				post.setBody(((HtmlTextConstruct)entry.getTextContent().getContent()).getHtml());
+			} else {
+				post.setBody(entry.getTextContent().getContent().getPlainText());
+			}
 			
 			post.setEditDate(Calendar.getInstance());
 			post.getEditDate().setTimeInMillis(entry.getEdited().getValue());
