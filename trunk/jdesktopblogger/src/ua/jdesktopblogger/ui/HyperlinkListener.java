@@ -6,7 +6,12 @@ import java.net.URL;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-
+/**
+ * Listener that open a hyperlink, that has been clicked on textPane
+ * 
+ * @author Alex Skosyr
+ *
+ */
 class ActivatedHyperlinkListener implements HyperlinkListener {
 
 	public ActivatedHyperlinkListener() {
