@@ -92,4 +92,17 @@ public class TablePostModel extends AbstractTableModel {
 				return String.class;
 		}
 	}
+	/**
+	 * return Post by its index in the table of the posts
+	 * @param iSelRow - index of row to get post
+	 * @return Selected post or <code>null</code>
+	 */
+	public Post getPost(int iSelRow) {
+		Blog blog = mainForm.getSelectedBlog();
+		if ((blog != null) && (blog.getPosts() != null)){
+			Post post =  (Post) blog.getPosts().toArray()[iSelRow];
+			return post;
+		}
+		return null;
+	}
 }
