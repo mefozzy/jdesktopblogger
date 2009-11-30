@@ -38,6 +38,9 @@ public class AccountRefreshAction extends SuperAction {
 
 			try {
 				ServiceFactory.getDefaultFactory().getBlogService().refreshAccount(account, form);
+				if (form != null){
+					form.openSelectedAccountTreeNode();
+				}
 			} catch (BlogServiceException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(form.getFrame(),

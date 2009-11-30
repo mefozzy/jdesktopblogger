@@ -47,6 +47,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import ua.cn.yet.common.ui.popup.PopupFactory;
@@ -88,7 +90,7 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private JSplitPane splitPaneLeftRight;
 
-	private JTextPane textPanePost;
+	private JTextPaneZoom textPanePost;
 
 	private JTable tablePosts;
 
@@ -575,7 +577,7 @@ public class MainForm implements IAccountListener, IPostListener {
 				.getEditPopup());
 		
 		// adding editor pane to output post body
-		textPanePost = new JTextPane();
+		textPanePost = new JTextPaneZoom();
 		textPanePost.setEditable(false);
 		textPanePost.setContentType("text/html");
 		textPanePost.setBackground(Color.WHITE);
@@ -585,6 +587,8 @@ public class MainForm implements IAccountListener, IPostListener {
 		areaLogScrollPane.setPreferredSize(new Dimension(700, 300));
 		areaLogScrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		areaLogScrollPane
+				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		areaLogScrollPane.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(BorderFactory
 						.createTitledBorder(""), BorderFactory
@@ -593,6 +597,9 @@ public class MainForm implements IAccountListener, IPostListener {
 		
 		HyperlinkListener hyperlinkListener = new ActivatedHyperlinkListener();
 		textPanePost.addHyperlinkListener(hyperlinkListener);
+		TextPaneZoomMouseListener keyListener = new TextPaneZoomMouseListener(textPanePost, areaLogScrollPane);
+		textPanePost.addMouseWheelListener(keyListener);
+		textPanePost.addKeyListener(keyListener);
 		    
 		panel.add(panelInfoPost, BorderLayout.NORTH);
 		panel.add(areaLogScrollPane, BorderLayout.CENTER);
@@ -810,6 +817,22 @@ public class MainForm implements IAccountListener, IPostListener {
 	public void postsLoaded(Blog blog) {
 		tablePostModel.fireTableDataChanged();
 	}
+	/**
+	 * select first blog of the selected account
+	 */
+	public void openSelectedAccountTreeNode(){
+		// get selected path
+		TreePath path = treeBlogs.getSelectionPath();
+		if ((path != null) && (path.getPathCount()>1)) {
+			// get selected account
+			Account account = (Account) path.getPath()[1];
+			if (account.getBlogs().size() > 0){
+				// create new path by adding first child to the end of the path
+				TreePath newPath = path.pathByAddingChild(account.getBlogs().toArray()[0]);
+				treeBlogs.setSelectionPath(newPath);
+			}
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see ua.jdesktopblogger.domain.IPostListener#postPublished(ua.jdesktopblogger.domain.Blog, ua.jdesktopblogger.domain.Post)
@@ -818,5 +841,6 @@ public class MainForm implements IAccountListener, IPostListener {
 	public void postPublished(Blog blog, Post publishedPost) {
 		tablePostModel.fireTableDataChanged();		
 	}
+
 	
 }
