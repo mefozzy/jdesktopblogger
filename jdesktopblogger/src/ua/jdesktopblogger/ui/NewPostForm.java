@@ -12,33 +12,25 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 
 import ua.cn.yet.common.ui.popup.PopupFactory;
 import ua.cn.yet.common.ui.popup.PopupListener;
-import ua.jdesktopblogger.Messages;
 import ua.jdesktopblogger.domain.Account;
-import ua.jdesktopblogger.domain.IAccountListener;
-import ua.jdesktopblogger.excetions.AccountIOException;
-import ua.jdesktopblogger.services.ServiceFactory;
+import ua.jdesktopblogger.domain.Blog;
+import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.ui.actions.newpost.PublishPostAction;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -47,6 +39,11 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+/**
+ * Form for creating new post
+ * 
+ * @author Yuriy Tkach
+ */
 public class NewPostForm extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -59,18 +56,25 @@ public class NewPostForm extends JFrame {
 
 	private JTextField fieldTitle;
 
-	// private JTextField fieldKeywords;
-
 	private JCheckBox fieldDraft;
 
 	private JTextPane editBody;
 
 	private PublishPostAction publishPostAction;
 
+	private Account account;
+
+	private JComboBox comboBlog;
+
+	private MainForm mainForm;
+
 	/**
 	 * Create the dialog.
 	 */
-	public NewPostForm() {
+	public NewPostForm(MainForm mainForm, Account account, Blog selectedBlog) {
+
+		this.mainForm = mainForm;
+		this.account = account;
 
 		setTitle("New Post");
 		setBounds(100, 100, 678, 432);
@@ -101,45 +105,50 @@ public class NewPostForm extends JFrame {
 					okButton.doClick();
 			}
 		});
-		
+
 		createActions();
 
 		MouseListener popupListener = new PopupListener(PopupFactory
 				.getEditPopup());
 
+		JLabel lbBlog = new JLabel("Blog");
+		contentPanel.add(lbBlog, "2, 2");
+
+		DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
+		BlogComboWrapper selected = null;
+		for (Blog blog : account.getBlogs()) {
+			BlogComboWrapper wrapper = new BlogComboWrapper(blog);
+			if (selected == null) {
+				selected = wrapper;
+			}
+			if (blog.equals(selectedBlog)) {
+				selected = wrapper;
+			}
+			comboBoxModel.addElement(wrapper);
+		}
+		comboBlog = new JComboBox(comboBoxModel);
+		comboBlog.setEditable(false);
+		lbBlog.setLabelFor(comboBlog);
+		comboBlog.setSelectedItem(selected);
+		contentPanel.add(comboBlog, "4, 2");
+
 		JLabel lbTitle = new JLabel("Title");
-		contentPanel.add(lbTitle, "2, 2");
+		contentPanel.add(lbTitle, "2, 4");
 
 		fieldTitle = new JTextField();
 		lbTitle.setLabelFor(fieldTitle);
 		fieldTitle.addMouseListener(popupListener);
-		final JFrame form = this;
 		fieldTitle.addFocusListener(new FocusListener() {
-
 			@Override
 			public void focusLost(FocusEvent e) {
-				String text = ((JTextField) e.getComponent()).getText();
-				
-				if (!text.isEmpty()) {
-					form.setTitle("New Post - " + text);
-				} else {
-					form.setTitle("New Post");
-				}
+				updateFormCaptionOnPostTitleEntry();
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
 			}
 		});
-		contentPanel.add(fieldTitle, "4, 2");
-
-		// JLabel lbKeywords = new JLabel("Keywords");
-		// contentPanel.add(lbKeywords, "2, 4");
-		//
-		// fieldKeywords = new JTextField();
-		// lbKeywords.setLabelFor(fieldKeywords);
-		// fieldKeywords.addMouseListener(popupListener);
-		// contentPanel.add(fieldKeywords, "4, 4");
+		contentPanel.add(fieldTitle, "4, 4");
 
 		JLabel lbDraft = new JLabel("Draft");
 		contentPanel.add(lbDraft, "2, 6");
@@ -158,7 +167,7 @@ public class NewPostForm extends JFrame {
 
 		okButton = new JButton(publishPostAction);
 		buttonPane.add(okButton);
-		//getRootPane().setDefaultButton(okButton);
+		// getRootPane().setDefaultButton(okButton);
 
 		cancelButton = new JButton("Cancel");
 		cancelButton.setMnemonic(KeyEvent.VK_CANCEL);
@@ -173,10 +182,24 @@ public class NewPostForm extends JFrame {
 	}
 
 	/**
+	 * Updating form's caption when post's title was entered
+	 */
+	protected void updateFormCaptionOnPostTitleEntry() {
+		String text = fieldTitle.getText();
+
+		if (!text.isEmpty()) {
+			this.setTitle("New Post - " + text);
+		} else {
+			this.setTitle("New Post");
+		}
+	}
+
+	/**
 	 * Creating actions that are used on buttons
 	 */
 	private void createActions() {
-		publishPostAction = new PublishPostAction(this);
+		publishPostAction = new PublishPostAction(this, account, mainForm,
+				mainForm);
 	}
 
 	/**
@@ -211,6 +234,39 @@ public class NewPostForm extends JFrame {
 		contentPanel.add(panel, new CellConstraints(2, 8, 3, 1));
 	}
 
+	/**
+	 * Getting blog object that is selected in the combo box
+	 * 
+	 * @return selected blog object
+	 */
+	public Blog getSelectedBlog() {
+		if (comboBlog.getSelectedItem() != null) {
+			return ((BlogComboWrapper) comboBlog.getSelectedItem()).getBlog();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Getting edited post or <code>null</code> if not all fields are set
+	 * 
+	 * @return post object or <code>null</code>
+	 */
+	public Post getEditedPost() {
+		if (fieldTitle.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this,
+					"Please, select a blog to create new post", mainForm
+							.getAppTitle(), JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+
+		Post post = new Post();
+		post.setTitle(fieldTitle.getText());
+		post.setDraft(fieldDraft.isSelected());
+		post.setBody(editBody.getText());
+		return post;
+	}
+
 	// /**
 	// * Creating editor toolbar
 	// *
@@ -242,12 +298,5 @@ public class NewPostForm extends JFrame {
 	// button.setText(null);
 	// toolbar.add(button);
 	// }
-
-	/**
-	 * Remembering account information and closing dialog if successful
-	 */
-	protected void rememberAccountInfo() {
-
-	}
 
 }
