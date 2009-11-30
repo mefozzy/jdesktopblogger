@@ -8,6 +8,7 @@ import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.AccountAuthenticateException;
 import ua.jdesktopblogger.excetions.BlogServiceException;
+import ua.jdesktopblogger.excetions.ProviderIOException;
 
 /**
  * Interface defines methods for all blog services.
@@ -49,7 +50,7 @@ public interface IBlogProvider {
 	 *             If error occurs
 	 */
 	public Set<Blog> loadListOfBlogs(Account account)
-			throws BlogServiceException;
+			throws BlogServiceException, ProviderIOException;
 
 	/**
 	 * Loading set of user posts within specified blog
@@ -61,9 +62,30 @@ public interface IBlogProvider {
 	 * @return Set of posts
 	 * @throws BlogServiceException
 	 *             If error occurs
-	 * @throws IllegalArgumentException If blog is not valid
+	 * @throws IllegalArgumentException
+	 *             If blog is not valid
 	 */
 	public SortedSet<Post> loadListOfPosts(Account account, Blog blog)
-			throws BlogServiceException, IllegalArgumentException;
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException;
+
+	/**
+	 * Publishing new post to the blog. Uploading post data to server. If
+	 * successfull then adding published post object to the blog's set of posts.
+	 * 
+	 * @param account
+	 *            Account to use
+	 * @param blog
+	 *            Blog to publish to
+	 * @param newPost
+	 *            New post
+	 * @throws BlogServiceException
+	 *             If error occurs
+	 * @throws IllegalArgumentException
+	 *             If blog is not valid
+	 */
+	public void publishNewPost(Account account, Blog blog, Post newPost)
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException;
 
 }
