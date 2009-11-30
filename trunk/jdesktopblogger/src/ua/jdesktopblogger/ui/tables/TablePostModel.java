@@ -60,7 +60,7 @@ public class TablePostModel extends AbstractTableModel {
 			switch (columnIndex) {
 			case POST_COLUMN_NUM: return rowIndex+1;
 			case POST_COLUMN_NAME: 
-				return !post.getTitle().isEmpty() ? post.getTitle() : post.getKeywords();
+				return !post.getTitle().isEmpty() ? post.getTitle() : post.getUrl();
 			case POST_COLUMN_IS_DRAFT: 
 				return post.isDraft() ? "D" : "";
 			case POST_COLUMN_DATE_PUBLISHED: 
