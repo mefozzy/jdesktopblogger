@@ -16,4 +16,14 @@ public interface IPostListener {
 	 */
 	public void postsLoaded(Blog blog);
 
+	/**
+	 * Event occurs when new post is published into blog
+	 * 
+	 * @param blog
+	 *            Blog that post was published to
+	 * @param publishedPost
+	 *            Published post object
+	 */
+	public void postPublished(Blog blog, Post publishedPost);
+
 }
