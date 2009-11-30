@@ -4,6 +4,7 @@ import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
 import ua.jdesktopblogger.domain.IAccountListener;
 import ua.jdesktopblogger.domain.IPostListener;
+import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.BlogServiceException;
 
 /**
@@ -38,7 +39,28 @@ public interface IBlogService {
 	 * @throws BlogServiceException
 	 *             If error occurs
 	 */
-	public void loadPosts(Account account, Blog blog, IAccountListener accountListener, IPostListener postListener)
+	public void loadPosts(Account account, Blog blog,
+			IAccountListener accountListener, IPostListener postListener)
+			throws BlogServiceException;
+
+	/**
+	 * Publishing new post to the blog
+	 * 
+	 * @param account
+	 *            Account to use
+	 * @param blog
+	 *            Blog to post new comment to
+	 * @param newPost
+	 *            new post object
+	 * @param accountListener
+	 *            account events listener
+	 * @param postListener
+	 *            post events listener
+	 * @throws BlogServiceException
+	 *             If error occurs
+	 */
+	public void publishPost(Account account, Blog blog, Post newPost,
+			IAccountListener accountListener, IPostListener postListener)
 			throws BlogServiceException;
 
 }
