@@ -60,6 +60,7 @@ import ua.jdesktopblogger.excetions.AccountIOException;
 import ua.jdesktopblogger.services.ServiceFactory;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
+import ua.jdesktopblogger.ui.actions.PostDeleteAction;
 import ua.jdesktopblogger.ui.actions.PostNewAction;
 import ua.jdesktopblogger.ui.actions.PostsLoadAction;
 import ua.jdesktopblogger.ui.actions.ViewShowHideAppAction;
@@ -126,6 +127,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	private AccountEditAction accountEditAction;
 	private AccountRefreshAction accountRefreshAction;
 	private PostsLoadAction postsLoadAction;
+	private PostDeleteAction postDeleteAction;
 
 	private PostNewAction postNewAction;
 	private ViewShowHideAppAction viewShowHideAppAction;
@@ -351,7 +353,8 @@ public class MainForm implements IAccountListener, IPostListener {
 		postsLoadAction = new PostsLoadAction(this);
 
 		postNewAction = new PostNewAction(this);
-
+		postDeleteAction = new PostDeleteAction(this);
+		
 		viewShowHideAppAction = new ViewShowHideAppAction(this);
 		// helpAboutAction = new HelpAboutAction(this);
 	}
@@ -444,6 +447,9 @@ public class MainForm implements IAccountListener, IPostListener {
 
 					// show the panel with post's information
 					MainForm.this.panelInfoPost.setVisible(true);
+					
+					// Enabling actions
+					postDeleteAction.setEnabled(true);
 				}
 			}
 		});
@@ -527,6 +533,10 @@ public class MainForm implements IAccountListener, IPostListener {
 		toolBar.add(button);
 
 		button = new JButton(postNewAction);
+		button.setText(null);
+		toolBar.add(button);
+		
+		button = new JButton(postDeleteAction);
 		button.setText(null);
 		toolBar.add(button);
 	}
@@ -876,8 +886,11 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	public Post getSelectedPost() {
 		int iSelPost = tablePosts.getSelectedRow();
-		return (Post) tablePosts.getModel().getValueAt(iSelPost,
-				TablePostModel.POST_COLUMN_WHOLE_POST);
+		if (iSelPost > -1) {
+			return (Post)tablePosts.getModel().getValueAt(iSelPost, TablePostModel.POST_COLUMN_WHOLE_POST);
+		} else {
+			return null;
+		}
 	}
 
 	/*
