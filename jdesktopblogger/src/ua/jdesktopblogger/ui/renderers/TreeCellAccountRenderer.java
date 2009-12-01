@@ -20,7 +20,7 @@ public class TreeCellAccountRenderer extends DefaultTreeCellRenderer {
 		accountIcon = new ImageIcon(TreeCellAccountRenderer.class
 				.getResource("../images/contents.png"));
 		blogIcon = new ImageIcon(TreeCellAccountRenderer.class
-				.getResource("../images/mail_generic.png"));
+				.getResource("../images/jdesktopblogger16.png"));
 	}
 
 	public Component getTreeCellRendererComponent(JTree tree, Object value,
