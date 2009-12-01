@@ -35,7 +35,7 @@ public class PostNewAction extends SuperAction {
 
 		Account account = form.getSelectedAccount();
 		if (account != null) {
-			new NewPostForm(form, account, form.getSelectedBlog())
+			new NewPostForm(form, account, form.getSelectedBlog(), null)
 					.setVisible(true);
 		} else {
 			JOptionPane.showMessageDialog(form.getFrame(),

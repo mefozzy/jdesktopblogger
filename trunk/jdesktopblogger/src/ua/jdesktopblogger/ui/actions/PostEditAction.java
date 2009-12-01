@@ -9,6 +9,7 @@ import javax.swing.KeyStroke;
 
 import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
+import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.ui.MainForm;
 import ua.jdesktopblogger.ui.NewPostForm;
 
@@ -31,7 +32,14 @@ public class PostEditAction extends SuperAction {
 		Account account = form.getSelectedAccount();
 		Blog blog = form.getSelectedBlog();
 		if ((account != null) && (blog != null)) {
-			new NewPostForm(form, account, blog).setVisible(true);
+			Post post = form.getSelectedPost();
+			if (post != null) {
+				new NewPostForm(form, account, blog, post).setVisible(true);
+			} else {
+				JOptionPane.showMessageDialog(form.getFrame(),
+						"Please, select post to edit",
+						form.getAppTitle(), JOptionPane.ERROR_MESSAGE);
+			}
 		} else {
 			JOptionPane.showMessageDialog(form.getFrame(),
 					"Please, select an account or blog to edit post",
