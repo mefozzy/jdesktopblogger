@@ -36,7 +36,7 @@ public class AccountRefreshAction extends SuperAction {
 		Account account = form.getSelectedAccount();
 		if (account != null) {
 
-			try {
+			try { 
 				ServiceFactory.getDefaultFactory().getBlogService().refreshAccount(account, form);
 				if (form != null){
 					form.openSelectedAccountTreeNode();
