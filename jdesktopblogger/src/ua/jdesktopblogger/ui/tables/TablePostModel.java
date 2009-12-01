@@ -55,7 +55,7 @@ public class TablePostModel extends AbstractTableModel {
 		if (rowIndex == -1)
 			return "";
 		Blog blog = mainForm.getSelectedBlog();
-		if (rowIndex > blog.getPosts().size()){
+		if (rowIndex >= blog.getPosts().size()){
 			return null;
 		}
 		if ((blog != null) && (blog.getPosts() != null)){
