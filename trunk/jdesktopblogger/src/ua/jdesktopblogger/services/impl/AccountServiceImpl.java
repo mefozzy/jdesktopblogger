@@ -146,4 +146,17 @@ public class AccountServiceImpl implements IAccountService {
 		return rez;
 	}
 
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.services.IAccountService#deleteAccount(ua.jdesktopblogger.domain.Account)
+	 */
+	@Override
+	public void deleteAccount(Account account) throws AccountIOException {
+		StringBuffer sb = buildSettingsDir();
+		sb.append(account.getLogin()).append(".xml");
+		File file = new File(sb.toString());
+		if (!file.delete()) {
+			throw new AccountIOException("Failed to delete account file");
+		}
+	}
+
 }
