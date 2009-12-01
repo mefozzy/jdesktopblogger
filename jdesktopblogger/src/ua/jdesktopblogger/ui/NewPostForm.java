@@ -206,11 +206,12 @@ public class NewPostForm extends JFrame {
 	 */
 	protected void updateFormCaptionOnPostTitleEntry() {
 		String text = fieldTitle.getText();
+		String titlePrefix = (selectedPost == null) ? "New " : "";
 
 		if (!text.isEmpty()) {
-			this.setTitle("New Post - " + text);
+			this.setTitle(titlePrefix + "Post - " + text);
 		} else {
-			this.setTitle("New Post");
+			this.setTitle(titlePrefix + "Post");
 		}
 	}
 
