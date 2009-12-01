@@ -36,6 +36,9 @@ public class Post implements Comparable<Post> {
 	
 	/** Url of the post */
 	private String url;
+	
+	/** Object that is specific to provider and that is associated with the post */
+	private Object providerSpecificObject;
 
 	/**
 	 * @return the title
@@ -156,6 +159,20 @@ public class Post implements Comparable<Post> {
 	 */
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	/**
+	 * @return the providerSpecificObject
+	 */
+	public Object getProviderSpecificObject() {
+		return providerSpecificObject;
+	}
+
+	/**
+	 * @param providerSpecificObject the providerSpecificObject to set
+	 */
+	public void setProviderSpecificObject(Object providerSpecificObject) {
+		this.providerSpecificObject = providerSpecificObject;
 	}
 	
 }

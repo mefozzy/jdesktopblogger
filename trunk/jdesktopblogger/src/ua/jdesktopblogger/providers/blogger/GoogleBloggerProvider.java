@@ -173,6 +173,9 @@ public class GoogleBloggerProvider implements IBlogProvider {
 		} else {
 			post.setUrl(entry.getEditLink().getHref());
 		}
+		
+		post.setProviderSpecificObject(entry);
+		
 		return post;
 	}
 
