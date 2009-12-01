@@ -15,6 +15,7 @@ import ua.jdesktopblogger.domain.IPostListener;
 import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.BlogServiceException;
 import ua.jdesktopblogger.services.ServiceFactory;
+import ua.jdesktopblogger.ui.MainForm;
 import ua.jdesktopblogger.ui.NewPostForm;
 
 /**
@@ -31,9 +32,10 @@ public class PublishPostAction extends NewPostFormSuperAction {
 
 	public PublishPostAction(NewPostForm form, Account account,
 			IAccountListener accountListener, IPostListener postListener) {
-		this("Publish", null, KeyEvent.VK_P, KeyStroke.getKeyStroke(
-				KeyEvent.VK_ACCEPT, ActionEvent.CTRL_MASK),
-				"Publish post to the server", form);
+		this("Publish", MainForm.createImageIcon("images/mail_send.png"),
+				KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_ACCEPT,
+						ActionEvent.CTRL_MASK), "Publish post to the server",
+				form);
 
 		this.account = account;
 		this.accountListener = accountListener;
