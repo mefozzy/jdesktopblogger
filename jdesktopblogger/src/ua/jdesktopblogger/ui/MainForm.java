@@ -27,7 +27,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -36,8 +35,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
@@ -47,8 +44,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import ua.cn.yet.common.ui.popup.PopupFactory;
@@ -852,6 +847,14 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	@Override
 	public void postUpdated(Blog blog, Post publishedPost) {
+		tablePostModel.fireTableDataChanged();		
+	}
+
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.domain.IPostListener#postDeleted(ua.jdesktopblogger.domain.Blog)
+	 */
+	@Override
+	public void postDeleted(Blog blog) {
 		tablePostModel.fireTableDataChanged();		
 	}
 
