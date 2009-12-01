@@ -43,4 +43,14 @@ public interface IAccountService {
 	 */
 	public Collection<Account> loadSavedAccounts() throws AccountIOException;
 
+	/**
+	 * Deleting account file
+	 * 
+	 * @param account
+	 *            Account to delete
+	 * @throws AccountIOException
+	 *             If io error occurs
+	 */
+	public void deleteAccount(Account account) throws AccountIOException;
+
 }
