@@ -45,14 +45,22 @@ public class AccountDialog extends JDialog {
 
 	private IAccountListener accountListener;
 
+	private Account selectedAccount;
+
 	/**
 	 * Create the dialog.
+	 * 
+	 * @param account
+	 *            Account for editing. Can be <code>null</code>
 	 */
-	public AccountDialog(JFrame owner, IAccountListener accountListener) {
+	public AccountDialog(JFrame owner, Account account,
+			IAccountListener accountListener) {
 		super(owner);
-		
+
 		this.accountListener = accountListener;
-		
+
+		this.selectedAccount = account;
+
 		setModal(true);
 		setResizable(false);
 		setTitle("Account information");
@@ -94,6 +102,9 @@ public class AccountDialog extends JDialog {
 		textField.setColumns(10);
 		textField.addKeyListener(getKeyListeners()[0]);
 		textField.addMouseListener(popupListener);
+		if (account != null) {
+			textField.setText(account.getLogin());
+		}
 
 		lblLogin.setLabelFor(textField);
 
@@ -104,6 +115,9 @@ public class AccountDialog extends JDialog {
 		passwordField.addKeyListener(getKeyListeners()[0]);
 		passwordField.addMouseListener(popupListener);
 		contentPanel.add(passwordField, "4, 4, fill, default");
+		if (account != null) {
+			passwordField.setText(account.getPassword());
+		}
 
 		lblPassword.setLabelFor(passwordField);
 
@@ -114,7 +128,7 @@ public class AccountDialog extends JDialog {
 		okButton = new JButton("OK");
 		okButton.setActionCommand("OK");
 		buttonPane.add(okButton);
-		//okButton.addKeyListener(getKeyListeners()[0]);
+		// okButton.addKeyListener(getKeyListeners()[0]);
 		okButton.setMnemonic(KeyEvent.VK_ACCEPT);
 		getRootPane().setDefaultButton(okButton);
 		okButton.addActionListener(new ActionListener() {
@@ -124,7 +138,7 @@ public class AccountDialog extends JDialog {
 		});
 
 		cancelButton = new JButton("Cancel");
-		//cancelButton.addKeyListener(getKeyListeners()[0]);
+		// cancelButton.addKeyListener(getKeyListeners()[0]);
 		cancelButton.setMnemonic(KeyEvent.VK_CANCEL);
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
@@ -152,26 +166,40 @@ public class AccountDialog extends JDialog {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
-		Account ac = new Account();
-		ac.setLogin(textField.getText());
+
+		Account ac;
+		if ((selectedAccount == null)
+				|| (!selectedAccount.getLogin().equals(textField.getText()))) {
+			ac = new Account();
+			ac.setLogin(textField.getText());
+			
+			if (selectedAccount != null) {
+				try {
+					ServiceFactory.getDefaultFactory().getAccountService().deleteAccount(selectedAccount);
+				} catch (AccountIOException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			ac = selectedAccount;
+		}
 		ac.setPassword(String.valueOf(passwordField.getPassword()));
-		
+
 		try {
-			ServiceFactory.getDefaultFactory().getAccountService().saveAccount(ac);
+			ServiceFactory.getDefaultFactory().getAccountService().saveAccount(
+					ac);
 		} catch (AccountIOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,
-					"There was an error when saving account file. "+
-					Messages.NEW_LINE_DOUBLE+
-					e.getLocalizedMessage(), this.getTitle(),
+					"There was an error when saving account file. "
+							+ Messages.NEW_LINE_DOUBLE
+							+ e.getLocalizedMessage(), this.getTitle(),
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		accountListener.accountCreated(ac);
 
 		dispose();
 	}
-
 }
