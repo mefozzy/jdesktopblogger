@@ -71,7 +71,7 @@ public interface IBlogProvider {
 
 	/**
 	 * Publishing new post to the blog. Uploading post data to server. If
-	 * successfull then adding published post object to the blog's set of posts.
+	 * successful then adding published post object to the blog's set of posts.
 	 * 
 	 * @param account
 	 *            Account to use
@@ -86,6 +86,26 @@ public interface IBlogProvider {
 	 *             If blog is not valid
 	 */
 	public Post publishNewPost(Account account, Blog blog, Post newPost)
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException;
+	
+	/**
+	 * Editing post of the blog. Uploading post data to server. If
+	 * successful then returning updated post.
+	 * 
+	 * @param account
+	 *            Account to use
+	 * @param blog
+	 *            Blog to publish to
+	 * @param post
+	 *           Post with edited information
+	 * @return Published post object
+	 * @throws BlogServiceException
+	 *             If error occurs
+	 * @throws IllegalArgumentException
+	 *             If blog is not valid
+	 */
+	public Post editPost(Account account, Blog blog, Post post)
 			throws BlogServiceException, ProviderIOException,
 			IllegalArgumentException;
 
