@@ -29,20 +29,27 @@ public class PublishPostAction extends NewPostFormSuperAction {
 	private Account account;
 	private IAccountListener accountListener;
 	private IPostListener postsListener;
+	private boolean editPost;
 
-	public PublishPostAction(NewPostForm form, Account account,
+	public static PublishPostAction createAction(NewPostForm form, boolean editPost, Account account,
 			IAccountListener accountListener, IPostListener postListener) {
-		this("Publish", MainForm.createImageIcon("images/mail_send.png"),
+		String caption = editPost ? "Edit post" : "Create post";
+		String description = editPost ? "Edit post entry on the server" : "Create post on the server";
+		
+		PublishPostAction act = new PublishPostAction(caption, MainForm.createImageIcon("images/mail_send.png"),
 				KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_ACCEPT,
-						ActionEvent.CTRL_MASK), "Publish post to the server",
+						ActionEvent.CTRL_MASK), description,
 				form);
-
-		this.account = account;
-		this.accountListener = accountListener;
-		this.postsListener = postListener;
+		
+		act.account = account;
+		act.accountListener = accountListener;
+		act.postsListener = postListener;
+		act.editPost = editPost;
+		
+		return act;
 	}
 
-	public PublishPostAction(String caption, ImageIcon icon, int keyEvent,
+	private PublishPostAction(String caption, ImageIcon icon, int keyEvent,
 			KeyStroke keyStroke, String description, NewPostForm form) {
 		super(caption, icon, keyEvent, keyStroke, description, form);
 	}
@@ -60,11 +67,19 @@ public class PublishPostAction extends NewPostFormSuperAction {
 			Post post = getNewPostForm().getEditedPost();
 
 			if (post != null) {
-
+				
 				try {
-					ServiceFactory.getDefaultFactory().getBlogService()
+					
+					if (editPost) {
+						ServiceFactory.getDefaultFactory().getBlogService()
+							.editPost(account, blog, post, accountListener,
+								postsListener);			
+					
+					} else {
+						ServiceFactory.getDefaultFactory().getBlogService()
 							.publishPost(account, blog, post, accountListener,
-									postsListener);
+								postsListener);						
+					}
 
 					getNewPostForm().dispose();
 				} catch (BlogServiceException e) {
