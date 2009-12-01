@@ -70,6 +70,10 @@ public class BlogServiceImpl implements IBlogService {
 			throw new BlogServiceException("Please, select blog to load posts for.");
 		}
 		
+		if (blog.getPosts() == null) {
+			loadPosts(account, blog, accountListener, null);
+		}
+		
 		Post publishedPost = pr.publishNewPost(account, blog, newPost);
 		
 		if (postListener != null) {
