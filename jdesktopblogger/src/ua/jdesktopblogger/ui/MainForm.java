@@ -708,6 +708,13 @@ public class MainForm implements IAccountListener, IPostListener {
 				return "";
 			}
 		};
+		treeBlogs.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(final MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					MainForm.this.tablePostModel.fireTableDataChanged();
+				}
+			}
+		});
 		TreeCellAccountRenderer treeCellAccountRenderer = new TreeCellAccountRenderer();
 		treeBlogs.setCellRenderer(treeCellAccountRenderer);
 		scrollPane.setViewportView(treeBlogs);
