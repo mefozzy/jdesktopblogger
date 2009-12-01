@@ -60,6 +60,8 @@ import ua.jdesktopblogger.excetions.AccountIOException;
 import ua.jdesktopblogger.services.ServiceFactory;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
+import ua.jdesktopblogger.ui.actions.PostDeleteAction;
+import ua.jdesktopblogger.ui.actions.PostEditAction;
 import ua.jdesktopblogger.ui.actions.PostNewAction;
 import ua.jdesktopblogger.ui.actions.PostsLoadAction;
 import ua.jdesktopblogger.ui.actions.ViewShowHideAppAction;
@@ -126,8 +128,11 @@ public class MainForm implements IAccountListener, IPostListener {
 	private AccountEditAction accountEditAction;
 	private AccountRefreshAction accountRefreshAction;
 	private PostsLoadAction postsLoadAction;
-
+	
+	private PostEditAction postEditAction;
 	private PostNewAction postNewAction;
+	private PostDeleteAction postDeleteAction;
+	
 	private ViewShowHideAppAction viewShowHideAppAction;
 
 	/**
@@ -351,7 +356,9 @@ public class MainForm implements IAccountListener, IPostListener {
 		postsLoadAction = new PostsLoadAction(this);
 
 		postNewAction = new PostNewAction(this);
-
+		postDeleteAction = new PostDeleteAction(this);
+		postEditAction = new PostEditAction(this);
+		
 		viewShowHideAppAction = new ViewShowHideAppAction(this);
 		// helpAboutAction = new HelpAboutAction(this);
 	}
@@ -427,6 +434,8 @@ public class MainForm implements IAccountListener, IPostListener {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					udpatePostInfoPanel();
+					postEditAction.setEnabled(true);
+					postDeleteAction.setEnabled(true);
 				}
 			}
 		});
@@ -510,6 +519,14 @@ public class MainForm implements IAccountListener, IPostListener {
 		toolBar.add(button);
 
 		button = new JButton(postNewAction);
+		button.setText(null);
+		toolBar.add(button);
+		
+		button = new JButton(postEditAction);
+		button.setText(null);
+		toolBar.add(button);
+		
+		button = new JButton(postDeleteAction);
 		button.setText(null);
 		toolBar.add(button);
 	}
@@ -667,6 +684,8 @@ public class MainForm implements IAccountListener, IPostListener {
 	private void createAccountsTree(JScrollPane scrollPane) {
 		treeModelBlogs = new BlogsTreeDataModel();
 		treeBlogs = new JTree(treeModelBlogs) {
+			private static final long serialVersionUID = 1L;
+
 			public String convertValueToText(Object value, boolean selected,
 					boolean expanded, boolean leaf, int row, boolean hasFocus) {
 				if (value instanceof Account) {
@@ -686,6 +705,9 @@ public class MainForm implements IAccountListener, IPostListener {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					tablePostModel.fireTableDataChanged();
 					udpatePostInfoPanel();
+					
+					postEditAction.setEnabled(false);
+					postDeleteAction.setEnabled(false);
 				}
 			}
 		});
