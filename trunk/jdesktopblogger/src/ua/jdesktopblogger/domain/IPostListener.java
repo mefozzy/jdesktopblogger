@@ -27,7 +27,7 @@ public interface IPostListener {
 	public void postPublished(Blog blog, Post publishedPost);
 	
 	/**
-	 * Event occurs when new post information was updated
+	 * Event occurs when post information was updated
 	 * 
 	 * @param blog
 	 *            Blog that post was published to
@@ -35,5 +35,13 @@ public interface IPostListener {
 	 *            Published post object
 	 */
 	public void postUpdated(Blog blog, Post publishedPost);
+	
+	/**
+	 * Event occurs when post was deleted
+	 * 
+	 * @param blog
+	 *            Blog that post was published to
+	 */
+	public void postDeleted(Blog blog);
 
 }
