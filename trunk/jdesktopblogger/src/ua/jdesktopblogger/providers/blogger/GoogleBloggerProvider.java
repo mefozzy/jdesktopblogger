@@ -243,9 +243,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 
 		// Create the entry to insert
 		Entry myEntry = new Entry();
-		myEntry.setTitle(new PlainTextConstruct(newPost.getTitle()));
-		myEntry.setContent(new PlainTextConstruct(newPost.getBody()));
-		myEntry.setDraft(newPost.isDraft());
+		updateEntryValuesFromPost(newPost, myEntry);
 
 		// Ask the service to insert the new entry
 		URL postUrl = constructFeedUrlForBlog(blog);
@@ -266,6 +264,17 @@ public class GoogleBloggerProvider implements IBlogProvider {
 		} catch (ServiceException e) {
 			throw new BlogServiceException(e);
 		}
+	}
+
+	/**
+	 * Setting values from post object to the entry object
+	 * @param post Post to take values from
+	 * @param entry entry to update
+	 */
+	private void updateEntryValuesFromPost(Post post, Entry entry) {
+		entry.setTitle(new PlainTextConstruct(post.getTitle()));
+		entry.setContent(new PlainTextConstruct(post.getBody()));
+		entry.setDraft(post.isDraft());
 	}
 
 	/**
@@ -291,6 +300,45 @@ public class GoogleBloggerProvider implements IBlogProvider {
 
 		if ((blog.getId() == null) || (blog.getId().isEmpty())) {
 			throw new IllegalArgumentException("Blog id is not valid");
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.providers.IBlogProvider#editPost(ua.jdesktopblogger.domain.Account, ua.jdesktopblogger.domain.Blog, ua.jdesktopblogger.domain.Post)
+	 */
+	@Override
+	public Post editPost(Account account, Blog blog, Post post)
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException {
+		
+		checkAccountAndBlogForValidity(account, blog);
+		
+		// Publishing new entry if it was not published before
+		if (post.getProviderSpecificObject() == null) {
+			return publishNewPost(account, blog, post);
+		}
+
+		// Create the entry to insert
+		Entry myEntry = (Entry) post.getProviderSpecificObject();
+		updateEntryValuesFromPost(post, myEntry);
+
+		BloggerService myService = (BloggerService) account.getProviderObject();
+
+		try {
+			URL editUrl = new URL(myEntry.getEditLink().getHref());
+			Entry entry = myService.update(editUrl, myEntry);
+			
+			Post publishedPost = constructPostFromEntry(entry);
+			publishedPost.setUploaded(true);
+			
+			blog.getPosts().remove(post);
+			blog.getPosts().add(publishedPost);
+			
+			return publishedPost;
+		} catch (IOException e) {
+			throw new ProviderIOException(e);
+		} catch (ServiceException e) {
+			throw new BlogServiceException(e);
 		}
 	}
 
