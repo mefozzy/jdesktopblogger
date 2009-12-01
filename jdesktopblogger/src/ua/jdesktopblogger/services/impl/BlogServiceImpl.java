@@ -97,4 +97,25 @@ public class BlogServiceImpl implements IBlogService {
 			postListener.postUpdated(blog, publishedPost);
 		}		
 	}
+
+	/* (non-Javadoc)
+	 * @see ua.jdesktopblogger.services.IBlogService#deletePost(ua.jdesktopblogger.domain.Account, ua.jdesktopblogger.domain.Blog, ua.jdesktopblogger.domain.Post, ua.jdesktopblogger.domain.IAccountListener, ua.jdesktopblogger.domain.IPostListener)
+	 */
+	@Override
+	public void deletePost(Account account, Blog blog, Post post,
+			IAccountListener accountListener, IPostListener postListener)
+			throws BlogServiceException {
+		IBlogProvider pr = ProviderFactory.getBlogProvider(account);
+		
+		if (account.getProviderObject() == null) {
+			refreshAccount(account, accountListener);
+			throw new BlogServiceException("Please, select blog to load posts for.");
+		}
+		
+		pr.deletePost(account, blog, post);
+		
+		if (postListener != null) {
+			postListener.postDeleted(blog);
+		}
+	}
 }
