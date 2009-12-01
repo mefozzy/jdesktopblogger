@@ -60,7 +60,6 @@ import ua.jdesktopblogger.excetions.AccountIOException;
 import ua.jdesktopblogger.services.ServiceFactory;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
-import ua.jdesktopblogger.ui.actions.PostDeleteAction;
 import ua.jdesktopblogger.ui.actions.PostNewAction;
 import ua.jdesktopblogger.ui.actions.PostsLoadAction;
 import ua.jdesktopblogger.ui.actions.ViewShowHideAppAction;
@@ -127,7 +126,6 @@ public class MainForm implements IAccountListener, IPostListener {
 	private AccountEditAction accountEditAction;
 	private AccountRefreshAction accountRefreshAction;
 	private PostsLoadAction postsLoadAction;
-	private PostDeleteAction postDeleteAction;
 
 	private PostNewAction postNewAction;
 	private ViewShowHideAppAction viewShowHideAppAction;
@@ -353,8 +351,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		postsLoadAction = new PostsLoadAction(this);
 
 		postNewAction = new PostNewAction(this);
-		postDeleteAction = new PostDeleteAction(this);
-		
+
 		viewShowHideAppAction = new ViewShowHideAppAction(this);
 		// helpAboutAction = new HelpAboutAction(this);
 	}
@@ -409,7 +406,10 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		createToolBar(contentPane);
 	}
-
+	/**
+	 * create tree for list of blogs and added listener to it
+	 * @param scrollPane - scroll pane to add jTree
+	 */
 	private void createBlogsTable(JScrollPane scrollPane) {
 		tablePostModel = new TablePostModel(this);
 
@@ -426,30 +426,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		tablePosts.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					// getting selected post and load its content to the
-					// editorPane
-					Post post = MainForm.this.getSelectedPost();
-					MainForm.this.textPanePost.setText(post.getBody());
-					MainForm.this.textPanePost.setCaretPosition(0);
-					MainForm.this.labelPostName.setText(post.getTitle());
-
-					// format dates of the post
-					DateFormat df = DateFormat.getDateTimeInstance(
-							DateFormat.MEDIUM, DateFormat.SHORT);
-
-					MainForm.this.labelPostDateEdit.setText(df.format(post
-							.getPublishDate().getTime()));
-					MainForm.this.labelPostDatePublish.setText(df.format(post
-							.getEditDate().getTime()));
-					MainForm.this.labelPostUrl.setText("<html><a href=\""
-							+ post.getUrl() + "\">" + post.getUrl()
-							+ "</a></html>");
-
-					// show the panel with post's information
-					MainForm.this.panelInfoPost.setVisible(true);
-					
-					// Enabling actions
-					postDeleteAction.setEnabled(true);
+					udpatePostInfoPanel();
 				}
 			}
 		});
@@ -533,10 +510,6 @@ public class MainForm implements IAccountListener, IPostListener {
 		toolBar.add(button);
 
 		button = new JButton(postNewAction);
-		button.setText(null);
-		toolBar.add(button);
-		
-		button = new JButton(postDeleteAction);
 		button.setText(null);
 		toolBar.add(button);
 	}
@@ -711,7 +684,8 @@ public class MainForm implements IAccountListener, IPostListener {
 		treeBlogs.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					MainForm.this.tablePostModel.fireTableDataChanged();
+					tablePostModel.fireTableDataChanged();
+					udpatePostInfoPanel();
 				}
 			}
 		});
@@ -893,11 +867,9 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	public Post getSelectedPost() {
 		int iSelPost = tablePosts.getSelectedRow();
-		if (iSelPost > -1) {
-			return (Post)tablePosts.getModel().getValueAt(iSelPost, TablePostModel.POST_COLUMN_WHOLE_POST);
-		} else {
-			return null;
-		}
+		if (iSelPost == -1) return null;
+		return (Post) tablePosts.getModel().getValueAt(iSelPost,
+				TablePostModel.POST_COLUMN_WHOLE_POST);
 	}
 
 	/*
@@ -956,6 +928,37 @@ public class MainForm implements IAccountListener, IPostListener {
 	@Override
 	public void postDeleted(Blog blog) {
 		tablePostModel.fireTableDataChanged();		
+	}
+	/**
+	 * update information about selected post
+	 */
+	private void udpatePostInfoPanel() {
+		// getting selected post and load its content to the
+		// editorPane
+		Post post = getSelectedPost();
+		if (post == null) {
+			panelInfoPost.setVisible(false);
+			textPanePost.setText("");
+			return ;
+		}
+		textPanePost.setText(post.getBody());
+		textPanePost.setCaretPosition(0);
+		labelPostName.setText(post.getTitle());
+
+		// format dates of the post
+		DateFormat df = DateFormat.getDateTimeInstance(
+				DateFormat.MEDIUM, DateFormat.SHORT);
+
+		labelPostDateEdit.setText(df.format(post
+				.getPublishDate().getTime()));
+		labelPostDatePublish.setText(df.format(post
+				.getEditDate().getTime()));
+		labelPostUrl.setText("<html><a href=\""
+				+ post.getUrl() + "\">" + post.getUrl()
+				+ "</a></html>");
+
+		// show the panel with post's information
+		panelInfoPost.setVisible(true);
 	}
 
 }
