@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -19,6 +20,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -107,28 +109,26 @@ public class MainForm implements IAccountListener, IPostListener {
 	private JTree treeBlogs;
 
 	private BlogsTreeDataModel treeModelBlogs;
-	
+
 	private TablePostModel tablePostModel;
-	
+
 	private JLabel labelPostName;
 
 	private JLabel labelPostDatePublish;
 
 	private JLabel labelPostDateEdit;
 
-	private JLabel labelPostKeywords;
-	
-	private JPanel panelInfoPost; 
+	private JLabel labelPostUrl;
+
+	private JPanel panelInfoPost;
 	// //////////////////////////////////////////////////////////////////////////////////
 
 	private AccountEditAction accountEditAction;
-	private AccountRefreshAction accountRefreshAction;	
+	private AccountRefreshAction accountRefreshAction;
 	private PostsLoadAction postsLoadAction;
-	
+
 	private PostNewAction postNewAction;
-
 	private ViewShowHideAppAction viewShowHideAppAction;
-
 
 	/**
 	 * Create the class and frame
@@ -191,7 +191,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		GraphicsEnvironment env = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
 		frame.setMaximizedBounds(env.getMaximumWindowBounds()); // taskbar not
-																// covered
+		// covered
 
 		frame
 				.setIconImage(createImageIcon("images/mail_generic22.png").getImage()); //$NON-NLS-1$
@@ -267,16 +267,17 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	private void startup() {
 		try {
-			Collection<Account> accounts = ServiceFactory.getDefaultFactory().getAccountService().loadSavedAccounts();
-			
+			Collection<Account> accounts = ServiceFactory.getDefaultFactory()
+					.getAccountService().loadSavedAccounts();
+
 			for (Account account : accounts) {
 				accountCreated(account);
 			}
-			
+
 		} catch (AccountIOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// if
 		// (ModelService.getInstance().getPreferencesWorker().isLoadLastFile())
 		// {
@@ -346,11 +347,11 @@ public class MainForm implements IAccountListener, IPostListener {
 	private void createActions(JFrame fr) {
 		accountEditAction = new AccountEditAction(this);
 		accountRefreshAction = new AccountRefreshAction(this);
-		
+
 		postsLoadAction = new PostsLoadAction(this);
-		
+
 		postNewAction = new PostNewAction(this);
-		
+
 		viewShowHideAppAction = new ViewShowHideAppAction(this);
 		// helpAboutAction = new HelpAboutAction(this);
 	}
@@ -408,32 +409,39 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private void createBlogsTable(JScrollPane scrollPane) {
 		tablePostModel = new TablePostModel(this);
-		TableSorterWithoutZeroColumn sorter = 
-			new TableSorterWithoutZeroColumn(tablePostModel);
+
+		TableSorterWithoutZeroColumn sorter = new TableSorterWithoutZeroColumn(
+				tablePostModel);
 		sorter.setSortingStatus(3, TableSorterWithoutZeroColumn.DESCENDING);
-		
+
 		tablePosts = new JTable(sorter);
 		sorter.setTableHeader(tablePosts.getTableHeader());
 		tablePosts.setName("tableMsgs");
-		
+
 		assignRendererForColumnsInBlogsTable();
-		
-		tablePosts.addMouseListener(new MouseAdapter(){
-			public void mouseClicked(final MouseEvent e){
-				if (e.getButton() == MouseEvent.BUTTON1){
-					// getting selected post and load its content to the editorPane
+
+		tablePosts.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(final MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					// getting selected post and load its content to the
+					// editorPane
 					Post post = MainForm.this.getSelectedPost();
 					MainForm.this.textPanePost.setText(post.getBody());
 					MainForm.this.textPanePost.setCaretPosition(0);
 					MainForm.this.labelPostName.setText(post.getTitle());
 
 					// format dates of the post
-					DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-					
-					MainForm.this.labelPostDateEdit.setText(df.format(post.getPublishDate().getTime()));
-					MainForm.this.labelPostDatePublish.setText(df.format(post.getEditDate().getTime()));
-//					MainForm.this.labelPostKeywords.setText(post.getKeywords().toString());
-					
+					DateFormat df = DateFormat.getDateTimeInstance(
+							DateFormat.MEDIUM, DateFormat.SHORT);
+
+					MainForm.this.labelPostDateEdit.setText(df.format(post
+							.getPublishDate().getTime()));
+					MainForm.this.labelPostDatePublish.setText(df.format(post
+							.getEditDate().getTime()));
+					MainForm.this.labelPostUrl.setText("<html><a href=\""
+							+ post.getUrl() + "\">" + post.getUrl()
+							+ "</a></html>");
+
 					// show the panel with post's information
 					MainForm.this.panelInfoPost.setVisible(true);
 				}
@@ -444,16 +452,16 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private void assignRendererForColumnsInBlogsTable() {
 		TableColumn col;
-		
+
 		// Setting table props
 		tablePosts.setRowSelectionAllowed(true);
 		tablePosts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
+
 		// Setting column name props
 		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_NAME);
 		DefaultTableCellRenderer namesRenderer = new DefaultTableCellRenderer();
-		//namesRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		// namesRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(namesRenderer);
 
 		// Setting column num props
@@ -463,7 +471,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setPreferredWidth(50);
 		DefaultTableCellRenderer numRenderer = new DefaultTableCellRenderer();
 		col.setCellRenderer(numRenderer);
-		
+
 		// Setting column num props
 		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_IS_DRAFT);
@@ -472,7 +480,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		DefaultTableCellRenderer boolRenderer = new DefaultTableCellRenderer();
 		boolRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		col.setCellRenderer(boolRenderer);
-		
+
 		// Setting column edited date props
 		col = tablePosts.getColumnModel().getColumn(
 				TablePostModel.POST_COLUMN_DATE_EDITED);
@@ -513,11 +521,11 @@ public class MainForm implements IAccountListener, IPostListener {
 		button = new JButton(accountRefreshAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		button = new JButton(postsLoadAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		button = new JButton(postNewAction);
 		button.setText(null);
 		toolBar.add(button);
@@ -550,7 +558,12 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		return panelStatusBar;
 	}
-
+	/**
+	 * creating text pane for post content outputting and panel with detailed 
+	 * post information
+	 * 
+	 * @return created area
+	 */
 	private JComponent createEntryViewArea() {
 		JPanel panel = new JPanel(new BorderLayout());
 		// adding panel with blog info
@@ -558,26 +571,37 @@ public class MainForm implements IAccountListener, IPostListener {
 		labelPostName = new JLabel();
 		labelPostName.setFont(new Font("Serif", Font.BOLD, 16));
 		panelInfoPost.add(labelPostName, BorderLayout.NORTH);
-		
-		// adding panel to output information about post dates (publish and edit)
-		JPanel panelForPostDates = new JPanel(new FlowLayout());
-		labelPostDateEdit = new JLabel();
-		panelForPostDates.add(new JLabel("Edit date:"));
-		panelForPostDates.add(labelPostDateEdit);
-		panelForPostDates.add(new JLabel("Publish date:"));
-		labelPostDatePublish = new JLabel();
-		panelForPostDates.add(labelPostDatePublish);
-		panelInfoPost.add(panelForPostDates, BorderLayout.WEST);
 
-//		labelPostKeywords = new JLabel();
-//		panelInfoPost.add(labelPostKeywords	, BorderLayout.SOUTH);
+		// adding panel to output information about post dates (publish and
+		// edit)
+		JPanel panelForPostDates = new JPanel(new FlowLayout());
+		createDatesInfoPanel(panelForPostDates);
+		panelInfoPost.add(panelForPostDates, BorderLayout.WEST);		
 		panelInfoPost.setVisible(false);
-		
+
 		MouseListener popupListener = new PopupListener(PopupFactory
 				.getEditPopup());
-		
+
+		JPanel panelForUrl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+		createURLInfoPanel(panelForUrl);
+
+		panelInfoPost.add(panelForUrl, BorderLayout.SOUTH);
+
 		// adding editor pane to output post body
 		textPanePost = new JTextPaneZoom();
+		JScrollPane areaLogScrollPane = createTextPanePostPanel(popupListener);
+
+		panel.add(panelInfoPost, BorderLayout.NORTH);
+		panel.add(areaLogScrollPane, BorderLayout.CENTER);
+		return panel;
+	}
+	/**
+	 * creating text pane for post content
+	 * @param popupListener - popup listener for text pane
+	 * @return - scroll pane with all components
+	 */
+	private JScrollPane createTextPanePostPanel(MouseListener popupListener) {
 		textPanePost.setEditable(false);
 		textPanePost.setContentType("text/html");
 		textPanePost.setBackground(Color.WHITE);
@@ -588,22 +612,67 @@ public class MainForm implements IAccountListener, IPostListener {
 		areaLogScrollPane
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		areaLogScrollPane
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		areaLogScrollPane.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(BorderFactory
 						.createTitledBorder(""), BorderFactory
 						.createEmptyBorder(0, 0, 0, 0)), areaLogScrollPane
 						.getBorder()));
-		
+
 		HyperlinkListener hyperlinkListener = new ActivatedHyperlinkListener();
 		textPanePost.addHyperlinkListener(hyperlinkListener);
-		TextPaneZoomMouseListener keyListener = new TextPaneZoomMouseListener(textPanePost, areaLogScrollPane);
+		TextPaneZoomMouseListener keyListener = new TextPaneZoomMouseListener(
+				textPanePost, areaLogScrollPane);
 		textPanePost.addMouseWheelListener(keyListener);
 		textPanePost.addKeyListener(keyListener);
-		    
-		panel.add(panelInfoPost, BorderLayout.NORTH);
-		panel.add(areaLogScrollPane, BorderLayout.CENTER);
-		return panel;
+		return areaLogScrollPane;
+	}
+	/**
+	 * creating panel for information about post dates (publish and edit)
+	 * @param panelForPostDates - panel to fill with components
+	 */
+	private void createDatesInfoPanel(JPanel panelForPostDates) {
+		labelPostDateEdit = new JLabel();
+		panelForPostDates.add(new JLabel("Edit date:"));
+		panelForPostDates.add(labelPostDateEdit);
+		panelForPostDates.add(new JLabel("Publish date:"));
+		labelPostDatePublish = new JLabel();
+		panelForPostDates.add(labelPostDatePublish);
+	}
+	/**
+	 * creating panel for information about URL of the post
+	 * @param panelForUrl - panel to add components
+	 */
+	private void createURLInfoPanel(JPanel panelForUrl) {
+		panelForUrl.add(new JLabel("Url of the post:"));
+		labelPostUrl = new JLabel();
+		labelPostUrl.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		labelPostUrl.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(final MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					Post post = MainForm.this.getSelectedPost();
+					if (post != null){
+						if( !java.awt.Desktop.isDesktopSupported() ) {
+
+				            System.err.println( "Desktop is not supported (fatal)" );
+				            System.exit( 1 );
+				        }
+						java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+						if( !desktop.isSupported( java.awt.Desktop.Action.BROWSE ) ) {
+
+				            System.err.println( "Desktop doesn't support the browse action (fatal)" );
+				            return;
+				        }
+						try {
+							desktop.browse( new URI(post.getUrl()));
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			}
+		});
+		panelForUrl.add(labelPostUrl);
 	}
 
 	/**
@@ -623,13 +692,13 @@ public class MainForm implements IAccountListener, IPostListener {
 				} else if (value instanceof Blog) {
 					Blog blog = (Blog) value;
 					return blog.getName();
-				} else if (value instanceof String){
-					return (String)value;
+				} else if (value instanceof String) {
+					return (String) value;
 				}
 				return "";
 			}
 		};
-		TreeCellAccountRenderer treeCellAccountRenderer = new TreeCellAccountRenderer(); 
+		TreeCellAccountRenderer treeCellAccountRenderer = new TreeCellAccountRenderer();
 		treeBlogs.setCellRenderer(treeCellAccountRenderer);
 		scrollPane.setViewportView(treeBlogs);
 
@@ -767,7 +836,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	@Override
 	public void accountRefreshed(Account account) {
 		treeBlogs.updateUI();
-		
+
 		postsLoadAction.setEnabled(true);
 		postNewAction.setEnabled(true);
 	}
@@ -779,7 +848,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	public Account getSelectedAccount() {
 		TreePath path = treeBlogs.getSelectionPath();
-		if ((path != null) && (path.getPathCount()>1)) {
+		if ((path != null) && (path.getPathCount() > 1)) {
 			return (Account) path.getPath()[1];
 		} else {
 			return null;
@@ -791,9 +860,9 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * 
 	 * @return Selected blog or <code>null</code>
 	 */
-	public Blog getSelectedBlog(){
+	public Blog getSelectedBlog() {
 		TreePath path = treeBlogs.getSelectionPath();
-		if ((path != null) && (path.getPathCount()>2)) {
+		if ((path != null) && (path.getPathCount() > 2)) {
 			return (Blog) path.getPath()[2];
 		} else {
 			return null;
@@ -805,37 +874,48 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * 
 	 * @return Selected post or <code>null</code>
 	 */
-	public Post getSelectedPost(){
+	public Post getSelectedPost() {
 		int iSelPost = tablePosts.getSelectedRow();
-		return (Post)tablePosts.getModel().getValueAt(iSelPost, TablePostModel.POST_COLUMN_WHOLE_POST);
+		return (Post) tablePosts.getModel().getValueAt(iSelPost,
+				TablePostModel.POST_COLUMN_WHOLE_POST);
 	}
-	
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.domain.IPostListener#postsLoaded(ua.jdesktopblogger.domain.Blog)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.domain.IPostListener#postsLoaded(ua.jdesktopblogger
+	 * .domain.Blog)
 	 */
 	@Override
 	public void postsLoaded(Blog blog) {
 		tablePostModel.fireTableDataChanged();
 	}
+
 	/**
 	 * select first blog of the selected account
 	 */
-	public void openSelectedAccountTreeNode(){
+	public void openSelectedAccountTreeNode() {
 		// get selected path
 		TreePath path = treeBlogs.getSelectionPath();
-		if ((path != null) && (path.getPathCount()>1)) {
+		if ((path != null) && (path.getPathCount() > 1)) {
 			// get selected account
 			Account account = (Account) path.getPath()[1];
-			if (account.getBlogs().size() > 0){
+			if (account.getBlogs().size() > 0) {
 				// create new path by adding first child to the end of the path
-				TreePath newPath = path.pathByAddingChild(account.getBlogs().toArray()[0]);
+				TreePath newPath = path.pathByAddingChild(account.getBlogs()
+						.toArray()[0]);
 				treeBlogs.setSelectionPath(newPath);
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.domain.IPostListener#postPublished(ua.jdesktopblogger.domain.Blog, ua.jdesktopblogger.domain.Post)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.domain.IPostListener#postPublished(ua.jdesktopblogger
+	 * .domain.Blog, ua.jdesktopblogger.domain.Post)
 	 */
 	@Override
 	public void postPublished(Blog blog, Post publishedPost) {
@@ -858,5 +938,4 @@ public class MainForm implements IAccountListener, IPostListener {
 		tablePostModel.fireTableDataChanged();		
 	}
 
-	
 }
