@@ -53,8 +53,11 @@ public class TablePostModel extends AbstractTableModel {
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		if (rowIndex == -1)
-			return ""; //$NON-NLS-1$
+			return null;
 		Blog blog = mainForm.getSelectedBlog();
+		if (rowIndex > blog.getPosts().size()){
+			return null;
+		}
 		if ((blog != null) && (blog.getPosts() != null)){
 			Post post =  (Post) blog.getPosts().toArray()[rowIndex];
 			switch (columnIndex) {
