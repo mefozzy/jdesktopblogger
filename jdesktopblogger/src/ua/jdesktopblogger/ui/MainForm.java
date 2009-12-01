@@ -433,9 +433,8 @@ public class MainForm implements IAccountListener, IPostListener {
 		tablePosts.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					udpatePostInfoPanel();
-					postEditAction.setEnabled(true);
-					postDeleteAction.setEnabled(true);
+					updatePostInfoPanel();
+					updatePostActions(true);
 				}
 			}
 		});
@@ -704,10 +703,9 @@ public class MainForm implements IAccountListener, IPostListener {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					tablePostModel.fireTableDataChanged();
-					udpatePostInfoPanel();
+					updatePostInfoPanel();
 					
-					postEditAction.setEnabled(false);
-					postDeleteAction.setEnabled(false);
+					updatePostActions(false);
 				}
 			}
 		});
@@ -934,6 +932,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	@Override
 	public void postPublished(Blog blog, Post publishedPost) {
 		tablePostModel.fireTableDataChanged();
+		updatePostInfoPanel();
 	}
 
 	/* (non-Javadoc)
@@ -941,7 +940,8 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	@Override
 	public void postUpdated(Blog blog, Post publishedPost) {
-		tablePostModel.fireTableDataChanged();		
+		tablePostModel.fireTableDataChanged();
+		updatePostInfoPanel();
 	}
 
 	/* (non-Javadoc)
@@ -949,18 +949,21 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	@Override
 	public void postDeleted(Blog blog) {
-		tablePostModel.fireTableDataChanged();		
+		tablePostModel.fireTableDataChanged();	
+		updatePostInfoPanel();
 	}
 	/**
 	 * update information about selected post
 	 */
-	private void udpatePostInfoPanel() {
+	private void updatePostInfoPanel() {
 		// getting selected post and load its content to the
 		// editorPane
 		Post post = getSelectedPost();
 		if (post == null) {
 			panelInfoPost.setVisible(false);
 			textPanePost.setText("");
+			
+			updatePostActions(false);
 			return ;
 		}
 		textPanePost.setText(post.getBody());
@@ -981,6 +984,11 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		// show the panel with post's information
 		panelInfoPost.setVisible(true);
+	}
+
+	private void updatePostActions(boolean enabled) {
+		postDeleteAction.setEnabled(enabled);
+		postEditAction.setEnabled(enabled);
 	}
 
 }
