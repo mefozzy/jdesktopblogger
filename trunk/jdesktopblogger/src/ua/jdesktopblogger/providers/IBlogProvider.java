@@ -88,17 +88,17 @@ public interface IBlogProvider {
 	public Post publishNewPost(Account account, Blog blog, Post newPost)
 			throws BlogServiceException, ProviderIOException,
 			IllegalArgumentException;
-	
+
 	/**
-	 * Editing post of the blog. Uploading post data to server. If
-	 * successful then returning updated post.
+	 * Editing post of the blog. Uploading post data to server. If successful
+	 * then returning updated post.
 	 * 
 	 * @param account
 	 *            Account to use
 	 * @param blog
 	 *            Blog to publish to
 	 * @param post
-	 *           Post with edited information
+	 *            Post with edited information
 	 * @return Published post object
 	 * @throws BlogServiceException
 	 *             If error occurs
@@ -106,6 +106,25 @@ public interface IBlogProvider {
 	 *             If blog is not valid
 	 */
 	public Post editPost(Account account, Blog blog, Post post)
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException;
+
+	/**
+	 * Delete post of the blog and removing post from blog's post set
+	 * 
+	 * @param account
+	 *            Account to use
+	 * @param blog
+	 *            Blog to publish to
+	 * @param post
+	 *            Post to delete
+	 * @return Published post object
+	 * @throws BlogServiceException
+	 *             If error occurs
+	 * @throws IllegalArgumentException
+	 *             If blog is not valid
+	 */
+	public void deletePost(Account account, Blog blog, Post post)
 			throws BlogServiceException, ProviderIOException,
 			IllegalArgumentException;
 
