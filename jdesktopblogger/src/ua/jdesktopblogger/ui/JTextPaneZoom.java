@@ -16,6 +16,12 @@ public class JTextPaneZoom extends JTextPane {
 	
 	private static final long serialVersionUID = 1L;
 
+	
+	
+	public JTextPaneZoom() {
+		super();
+	}
+
 	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#paint(java.awt.Graphics)
 	 */
@@ -25,7 +31,10 @@ public class JTextPaneZoom extends JTextPane {
 		gd.scale(scale, scale);
 		super.paint(g);
 	}
-
+	
+	public void repaint(int x, int y, int width, int height) {
+		super.repaint(0, 0, getWidth(), getHeight());
+	}
 	/**
 	 * @return the scale
 	 */
@@ -40,6 +49,4 @@ public class JTextPaneZoom extends JTextPane {
 		this.scale = scale;
 	}
 
-	
-	
 }
