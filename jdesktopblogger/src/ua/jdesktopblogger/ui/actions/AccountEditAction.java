@@ -4,8 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.ui.AccountDialog;
 import ua.jdesktopblogger.ui.MainForm;
 
@@ -26,7 +28,14 @@ public class AccountEditAction extends SuperAction {
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
-		new AccountDialog(form.getFrame(), form).setVisible(true);
+		Account account = form.getSelectedAccount();
+		if (account != null) {
+			new AccountDialog(form.getFrame(), account, form).setVisible(true);
+		} else {
+			JOptionPane.showMessageDialog(form.getFrame(),
+					"Please, select an account to edit",
+					form.getAppTitle(), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 }
