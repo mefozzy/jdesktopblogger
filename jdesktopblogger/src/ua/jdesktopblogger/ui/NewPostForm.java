@@ -68,15 +68,23 @@ public class NewPostForm extends JFrame {
 
 	private MainForm mainForm;
 
+	private Post selectedPost;
+
 	/**
 	 * Create the dialog.
 	 */
-	public NewPostForm(MainForm mainForm, Account account, Blog selectedBlog) {
+	public NewPostForm(MainForm mainForm, Account account, Blog selectedBlog,
+			Post selectedPost) {
 
 		this.mainForm = mainForm;
 		this.account = account;
+		this.selectedPost = selectedPost;
 
-		setTitle("New Post");
+		if (selectedPost == null) {
+			setTitle("New Post");
+		} else {
+			setTitle("Post - " + selectedPost.getTitle());
+		}
 		setBounds(100, 100, 678, 432);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -106,7 +114,7 @@ public class NewPostForm extends JFrame {
 			}
 		});
 
-		createActions();
+		createActions(selectedPost);
 
 		MouseListener popupListener = new PopupListener(PopupFactory
 				.getEditPopup());
@@ -131,6 +139,9 @@ public class NewPostForm extends JFrame {
 		lbBlog.setLabelFor(comboBlog);
 		comboBlog.setSelectedItem(selected);
 		contentPanel.add(comboBlog, "4, 2");
+		if (selectedPost != null) {
+			comboBlog.setEnabled(false);
+		}
 
 		JLabel lbTitle = new JLabel("Title");
 		contentPanel.add(lbTitle, "2, 4");
@@ -149,6 +160,9 @@ public class NewPostForm extends JFrame {
 			}
 		});
 		contentPanel.add(fieldTitle, "4, 4");
+		if (selectedPost != null) {
+			fieldTitle.setText(selectedPost.getTitle());
+		}
 
 		JLabel lbDraft = new JLabel("Draft");
 		contentPanel.add(lbDraft, "2, 6");
@@ -158,8 +172,14 @@ public class NewPostForm extends JFrame {
 		fieldDraft.addMouseListener(popupListener);
 		fieldDraft.setSelected(true);
 		contentPanel.add(fieldDraft, "4, 6");
+		if (selectedPost != null) {
+			fieldDraft.setSelected(selectedPost.isDraft());
+		}
 
 		createEditor();
+		if (selectedPost != null) {
+			editBody.setText(selectedPost.getBody());
+		}
 
 		JPanel buttonPane = new JPanel();
 		contentPanel.add(buttonPane, "4, 10");
@@ -196,10 +216,12 @@ public class NewPostForm extends JFrame {
 
 	/**
 	 * Creating actions that are used on buttons
+	 * 
+	 * @param selectedPost
 	 */
-	private void createActions() {
-		publishPostAction = new PublishPostAction(this, account, mainForm,
-				mainForm);
+	private void createActions(Post selectedPost) {
+		publishPostAction = PublishPostAction.createAction(this,
+				(selectedPost != null), account, mainForm, mainForm);
 	}
 
 	/**
@@ -255,12 +277,12 @@ public class NewPostForm extends JFrame {
 	public Post getEditedPost() {
 		if (fieldTitle.getText().isEmpty()) {
 			JOptionPane.showMessageDialog(this,
-					"Please, select a blog to create new post", mainForm
+					"Please, enter title for the post", mainForm
 							.getAppTitle(), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
-
-		Post post = new Post();
+		
+		Post post = (selectedPost == null) ? new Post() : selectedPost;
 		post.setTitle(fieldTitle.getText());
 		post.setDraft(fieldDraft.isSelected());
 		post.setBody(editBody.getText());
