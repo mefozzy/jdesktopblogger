@@ -271,17 +271,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * Performing startup actions if they were specified in preferences
 	 */
 	private void startup() {
-		try {
-			Collection<Account> accounts = ServiceFactory.getDefaultFactory()
-					.getAccountService().loadSavedAccounts();
-
-			for (Account account : accounts) {
-				accountCreated(account);
-			}
-
-		} catch (AccountIOException e) {
-			e.printStackTrace();
-		}
+		loadSavedAccounts();
 
 		// if
 		// (ModelService.getInstance().getPreferencesWorker().isLoadLastFile())
@@ -302,6 +292,29 @@ public class MainForm implements IAccountListener, IPostListener {
 		// emailCheckAllAction.actionPerformed(null);
 		// }
 
+	}
+
+	/**
+	 * Loading all saved accounts to the tree
+	 */
+	private void loadSavedAccounts() {
+		try {
+			Collection<Account> accounts = ServiceFactory.getDefaultFactory()
+					.getAccountService().loadSavedAccounts();
+			
+			treeModelBlogs.removeAllAccounts();
+
+			for (Account account : accounts) {
+				treeModelBlogs.addAccount(account);
+				treeBlogs.updateUI();
+
+				// Enabling actions
+				accountRefreshAction.setEnabled(true);
+			}
+
+		} catch (AccountIOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -508,14 +521,20 @@ public class MainForm implements IAccountListener, IPostListener {
 		button = new JButton(accountEditAction);
 		button.setText(null);
 		toolBar.add(button);
+		
+		toolBar.addSeparator();
 
 		button = new JButton(accountRefreshAction);
 		button.setText(null);
 		toolBar.add(button);
+		
+		toolBar.addSeparator();
 
 		button = new JButton(postsLoadAction);
 		button.setText(null);
 		toolBar.add(button);
+		
+		toolBar.addSeparator();
 
 		button = new JButton(postNewAction);
 		button.setText(null);
@@ -819,11 +838,10 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	@Override
 	public void accountCreated(Account account) {
-		treeModelBlogs.addAccount(account);
-		treeBlogs.updateUI();
-
-		// Enabling actions
-		accountRefreshAction.setEnabled(true);
+		loadSavedAccounts();
+		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
+		path = path.pathByAddingChild(account);
+		treeBlogs.setSelectionPath(path);
 	}
 
 	/*
