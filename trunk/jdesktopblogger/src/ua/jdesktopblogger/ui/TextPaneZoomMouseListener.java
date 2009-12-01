@@ -29,15 +29,9 @@ public class TextPaneZoomMouseListener implements MouseWheelListener,
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		String message;
 		int notches = e.getWheelRotation();
 		if (ctrlPressed) {
-			// getting count of rotations
-			if (notches < 0) {
-				message = "Mouse wheel moved UP " + notches;
-			} else {
-				message = "Mouse wheel moved DOWN " + notches;
-			}
+
 			// getting old scale value
 			double newScale = textPane.getScale() + notches*0.1;
 			// setting new scale value
@@ -54,7 +48,6 @@ public class TextPaneZoomMouseListener implements MouseWheelListener,
 			int i = textPane.getCaretPosition();
 			i += notches * 40;
 //			textPane.getCaret().
-			System.out.println("textPane scroll. i:" + i + " length:" + textPane.getText().length());
 			if (i < 0) {
 				i = 0;
 			} else if (i >= textPane.getText().length()) {
