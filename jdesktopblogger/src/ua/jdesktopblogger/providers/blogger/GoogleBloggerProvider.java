@@ -36,7 +36,9 @@ public class GoogleBloggerProvider implements IBlogProvider {
 
 	private static final String FEED_URI_BASE = "http://www.blogger.com/feeds";
 	private static final String POSTS_FEED_URI_SUFFIX = "/posts/default";
-	//private static final String COMMENTS_FEED_URI_SUFFIX = "/comments/default";
+
+	// private static final String COMMENTS_FEED_URI_SUFFIX =
+	// "/comments/default";
 
 	/*
 	 * (non-Javadoc)
@@ -173,9 +175,9 @@ public class GoogleBloggerProvider implements IBlogProvider {
 		} else {
 			post.setUrl(entry.getEditLink().getHref());
 		}
-		
+
 		post.setProviderSpecificObject(entry);
-		
+
 		return post;
 	}
 
@@ -252,12 +254,12 @@ public class GoogleBloggerProvider implements IBlogProvider {
 
 		try {
 			Entry entry = myService.insert(postUrl, myEntry);
-			
+
 			Post publishedPost = constructPostFromEntry(entry);
 			publishedPost.setUploaded(true);
-			
+
 			blog.getPosts().add(publishedPost);
-			
+
 			return publishedPost;
 		} catch (IOException e) {
 			throw new ProviderIOException(e);
@@ -268,8 +270,11 @@ public class GoogleBloggerProvider implements IBlogProvider {
 
 	/**
 	 * Setting values from post object to the entry object
-	 * @param post Post to take values from
-	 * @param entry entry to update
+	 * 
+	 * @param post
+	 *            Post to take values from
+	 * @param entry
+	 *            entry to update
 	 */
 	private void updateEntryValuesFromPost(Post post, Entry entry) {
 		entry.setTitle(new PlainTextConstruct(post.getTitle()));
@@ -303,16 +308,21 @@ public class GoogleBloggerProvider implements IBlogProvider {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.providers.IBlogProvider#editPost(ua.jdesktopblogger.domain.Account, ua.jdesktopblogger.domain.Blog, ua.jdesktopblogger.domain.Post)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.providers.IBlogProvider#editPost(ua.jdesktopblogger
+	 * .domain.Account, ua.jdesktopblogger.domain.Blog,
+	 * ua.jdesktopblogger.domain.Post)
 	 */
 	@Override
 	public Post editPost(Account account, Blog blog, Post post)
 			throws BlogServiceException, ProviderIOException,
 			IllegalArgumentException {
-		
+
 		checkAccountAndBlogForValidity(account, blog);
-		
+
 		// Publishing new entry if it was not published before
 		if (post.getProviderSpecificObject() == null) {
 			return publishNewPost(account, blog, post);
@@ -327,19 +337,55 @@ public class GoogleBloggerProvider implements IBlogProvider {
 		try {
 			URL editUrl = new URL(myEntry.getEditLink().getHref());
 			Entry entry = myService.update(editUrl, myEntry);
-			
+
 			Post publishedPost = constructPostFromEntry(entry);
 			publishedPost.setUploaded(true);
-			
+
 			blog.getPosts().remove(post);
 			blog.getPosts().add(publishedPost);
-			
+
 			return publishedPost;
 		} catch (IOException e) {
 			throw new ProviderIOException(e);
 		} catch (ServiceException e) {
 			throw new BlogServiceException(e);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.providers.IBlogProvider#deletePost(ua.jdesktopblogger
+	 * .domain.Account, ua.jdesktopblogger.domain.Blog,
+	 * ua.jdesktopblogger.domain.Post)
+	 */
+	@Override
+	public void deletePost(Account account, Blog blog, Post post)
+			throws BlogServiceException, ProviderIOException,
+			IllegalArgumentException {
+		checkAccountAndBlogForValidity(account, blog);
+
+		if (post.getProviderSpecificObject() != null) {
+
+			// Create the entry to insert
+			Entry myEntry = (Entry) post.getProviderSpecificObject();
+			updateEntryValuesFromPost(post, myEntry);
+
+			BloggerService myService = (BloggerService) account
+					.getProviderObject();
+
+			try {
+				URL editUrl = new URL(myEntry.getEditLink().getHref());
+				myService.delete(editUrl);
+			} catch (IOException e) {
+				throw new ProviderIOException(e);
+			} catch (ServiceException e) {
+				throw new BlogServiceException(e);
+			}
+
+		}
+		blog.getPosts().remove(post);
 	}
 
 }
