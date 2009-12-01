@@ -90,4 +90,8 @@ public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 		accountsList.remove(account);
 	}
 	
+	public void removeAllAccounts() {
+		accountsList.clear();
+	}
+	
 }
