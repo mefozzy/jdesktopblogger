@@ -62,5 +62,25 @@ public interface IBlogService {
 	public void publishPost(Account account, Blog blog, Post newPost,
 			IAccountListener accountListener, IPostListener postListener)
 			throws BlogServiceException;
+	
+	/**
+	 * Edit existing post of the blog
+	 * 
+	 * @param account
+	 *            Account to use
+	 * @param blog
+	 *            Blog to post new comment to
+	 * @param post
+	 *            edit post object
+	 * @param accountListener
+	 *            account events listener
+	 * @param postListener
+	 *            post events listener
+	 * @throws BlogServiceException
+	 *             If error occurs
+	 */
+	public void editPost(Account account, Blog blog, Post post,
+			IAccountListener accountListener, IPostListener postListener)
+			throws BlogServiceException;
 
 }
