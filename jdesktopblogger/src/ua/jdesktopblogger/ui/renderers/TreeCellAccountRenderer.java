@@ -8,6 +8,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import ua.jdesktopblogger.domain.Account;
 import ua.jdesktopblogger.domain.Blog;
+import ua.jdesktopblogger.ui.MainForm;
 
 public class TreeCellAccountRenderer extends DefaultTreeCellRenderer {
 
@@ -17,10 +18,8 @@ public class TreeCellAccountRenderer extends DefaultTreeCellRenderer {
 	private ImageIcon blogIcon;
 
 	public TreeCellAccountRenderer() {
-		accountIcon = new ImageIcon(TreeCellAccountRenderer.class
-				.getResource("../images/contents.png"));
-		blogIcon = new ImageIcon(TreeCellAccountRenderer.class
-				.getResource("../images/jdesktopblogger16.png"));
+		accountIcon = MainForm.createImageIcon("images/contents.png");
+		blogIcon = MainForm.createImageIcon("images/jdesktopblogger16.png");
 	}
 
 	public Component getTreeCellRendererComponent(JTree tree, Object value,
