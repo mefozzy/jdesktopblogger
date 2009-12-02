@@ -19,8 +19,7 @@ public class AccountRefreshAction extends SuperAction {
 	public AccountRefreshAction(MainForm fr) {
 		this("Refresh Acount",
 				MainForm.createImageIcon("images/reload.png"), //$NON-NLS-1$
-				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
-						ActionEvent.ALT_MASK),
+				KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0),
 				"Refresh list of blogs for account", fr);
 
 		setEnabled(false);

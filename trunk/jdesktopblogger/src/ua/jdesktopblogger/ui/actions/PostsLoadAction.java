@@ -19,8 +19,8 @@ public class PostsLoadAction extends SuperAction {
 
 	public PostsLoadAction(MainForm fr) {
 		this("Load posts", MainForm.createImageIcon("images/mail_get.png"), //$NON-NLS-1$
-				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
-						ActionEvent.ALT_MASK), "Load posts for the blog", fr);
+				KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0),
+				"Load posts for the blog", fr);
 
 		setEnabled(false);
 	}

@@ -18,8 +18,8 @@ public class PostEditAction extends SuperAction {
 
 	public PostEditAction(MainForm fr) {
 		this("Edit post", MainForm.createImageIcon("images/mail_edit.png"), //$NON-NLS-1$
-				KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_E,
-						ActionEvent.ALT_MASK), "Edit post data", fr);
+				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
+						ActionEvent.CTRL_MASK), "Edit post data", fr);
 		setEnabled(false);
 	}
 
