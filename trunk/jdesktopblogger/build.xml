@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<project name="JDesktopBlogger" default="main" basedir=".">
+
+	<property name="fjepPath" value="lib/fatjar.jar" />
+	<taskdef name="fatjar.build" classname="net.sf.fjep.anttask.FJBuildTask" classpath="${fjepPath}" />
+	<typedef name="fatjar.manifest" classname="net.sf.fjep.anttask.FJManifestType" classpath="${fjepPath}" />
+	<typedef name="fatjar.exclude" classname="net.sf.fjep.anttask.FJExcludeType" classpath="${fjepPath}" />
+	<typedef name="fatjar.jarsource" classname="net.sf.fjep.anttask.FJJarSourceType" classpath="${fjepPath}" />
+	<typedef name="fatjar.filesource" classname="net.sf.fjep.anttask.FJFileSourceType" classpath="${fjepPath}" />
+
+	<buildnumber file="src/ua/jdesktopblogger/build_number.properties" />
+	<loadproperties srcFile="src/ua/jdesktopblogger/build_number.properties" />
+	<tstamp />
+
+	<property name="VERSION" value="${major.version.number}.${minor.version.number}.${build.number}" />
+	<property name="SPEC_VERSION" value="${major.version.number}.${minor.version.number}" />
+	<property name="build" value="bin" />
+	<property name="jarFile" value="${build}/jar/startup.jar" />
+	<property name="jarTmp" value="${build}/tmp.jar" />
+	<property name="manifest" value="${build}/MANIFEST.MF" />
+
+	<property environment="env" />
+
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.6" />
+	<property name="source" value="1.6" />
+
+	<path id="project.classpath">
+		<pathelement location="bin" />
+		<fileset dir="lib/" includes="*.jar" />
+	</path>
+
+
+	<target name="init">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build}/jar" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+	</target>
+
+	<target name="build" depends="init">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac destdir="${build}" debuglevel="${debuglevel}" target="${target}" source="${source}">
+			<src path="src" />
+			<exclude name="**/build/**" />
+			<classpath refid="project.classpath" />
+		</javac>
+		<copy todir="${build}">
+			<fileset dir="src">
+				<include name="**/images/*" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="help">
+		<echo message="Please run: $ ant -v -projecthelp" />
+	</target>
+
+	<target name="create-manifest" depends="init" description="Creating manifest file">
+		<echo message="Creating main manifest file in ${manifest}" />
+		<manifest file="${manifest}">
+			<attribute name="Built-By" value="Yuriy E. Tkach" />
+			<attribute name="Built-On" value="${TODAY}" />
+			<attribute name="Main-Class" value="ua.jdesktopblogger.JDesktopBloggerApp" />
+
+			<section name="JDesktopBlogger">
+				<attribute name="Specification-Title" value="JDesktopBlogger" />
+				<attribute name="Specification-Version" value="${SPEC_VERSION}" />
+				<attribute name="Specification-Vendor" value="Yuriy E. Tkach, Oleksandr M. Skosyr" />
+				<attribute name="Implementation-Title" value="jdesktopblogger-${VERSION}" />
+				<attribute name="Implementation-Version" value="${VERSION}" />
+				<attribute name="Implementation-Vendor" value="Yuriy E. Tkach, Oleksandr M. Skosyr" />
+			</section>
+
+		</manifest>
+	</target>
+
+	<target name="jar" depends="clean, build, create-manifest" description="Creating single main jar with only program files">
+		<jar destfile="${build}/main.jar" basedir="${build}" index="true" manifest="${manifest}" />
+	</target>
+
+	<target name="main" depends="jar">
+		<echo message="Manual creation of FatJar's ${jarFile}" />
+
+		<fatjar.build onejar="true" output="${jarTmp}">
+		</fatjar.build>
+
+		<!-- Unpacking contents of jar file -->
+		<unjar src="${jarTmp}" dest="${build}/unjar" />
+
+		<!-- Copying files to the directories -->
+		<copy todir="${build}/unjar/main" file="${build}/main.jar" overwrite="true" />
+		<copy todir="${build}/unjar/lib">
+			<fileset dir="lib">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+		<delete file="${jarFile}" />
+		<!-- Creating new jar file with extended manifest -->
+		<jar destfile="${jarFile}" basedir="${build}/unjar" index="true" manifest="${build}/unjar/META-INF/MANIFEST.MF">
+			<manifest>
+				<attribute name="Built-By" value="Yuriy E. Tkach" />
+				<attribute name="Built-On" value="${TODAY}" />
+
+				<section name="JDesktopBlogger">
+					<attribute name="Specification-Title" value="JDesktopBlogger" />
+					<attribute name="Specification-Version" value="${SPEC_VERSION}" />
+					<attribute name="Specification-Vendor" value="Yuriy E. Tkach, Oleksandr M. Skosyr" />
+					<attribute name="Implementation-Title" value="jdesktopblogger-${VERSION}" />
+					<attribute name="Implementation-Version" value="${VERSION}" />
+					<attribute name="Implementation-Vendor" value="Yuriy E. Tkach, Oleksandr M. Skosyr" />
+				</section>
+			</manifest>
+		</jar>
+
+		<!-- Deleting unpacked directory and created manifest -->
+		<delete dir="${build}/unjar" />
+		<delete file="${manifest}" />
+		<delete file="${build}/tmp.jar" />
+		<delete file="${build}/main.jar" />
+
+		<echo message="Created ${jarFile} with version ${VERSION}" />
+	</target>
+</project>
