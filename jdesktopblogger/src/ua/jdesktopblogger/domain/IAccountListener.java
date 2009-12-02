@@ -14,5 +14,7 @@ public interface IAccountListener {
 	
 	public void accountRefreshed(Account account);
 	
+	public void accountDeleted(Account account);
+	
 
 }
