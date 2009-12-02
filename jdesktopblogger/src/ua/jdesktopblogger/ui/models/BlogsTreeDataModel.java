@@ -12,6 +12,10 @@ import ua.jdesktopblogger.domain.Blog;
 public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 
 	private Set<Account> accountsList = new HashSet<Account>();
+	
+	public int getSize() {
+		return accountsList.size();
+	}
 
 	@Override
 	public Object getChild(Object parent, int index) {
