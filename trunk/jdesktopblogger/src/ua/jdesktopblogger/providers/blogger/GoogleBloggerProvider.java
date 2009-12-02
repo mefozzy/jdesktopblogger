@@ -98,7 +98,7 @@ public class GoogleBloggerProvider implements IBlogProvider {
 					"Account credentials are not set");
 		}
 
-		BloggerService myService = new BloggerService("exampleCo-exampleApp-1");
+		BloggerService myService = new BloggerService("gnu-jdesktopblogger-1");
 		// Authenticate using ClientLogin
 		try {
 			myService.setUserCredentials(account.getLogin(), account
