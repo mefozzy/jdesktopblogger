@@ -949,11 +949,9 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * jdesktopblogger.domain.Account)
 	 */
 	@Override
-	public void accountRefreshed(Account account) {
+	public void accountRefreshed(Account account) {		
+		selectFirstBlogOfSelectedAccount();
 		treeBlogs.updateUI();
-
-		postsLoadAction.setEnabled(true);
-		postNewAction.setEnabled(true);
 	}
 
 	/**
@@ -1012,7 +1010,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	/**
 	 * select first blog of the selected account
 	 */
-	public void openSelectedAccountTreeNode() {
+	public void selectFirstBlogOfSelectedAccount() {
 		// get selected path
 		TreePath path = treeBlogs.getSelectionPath();
 		if ((path != null) && (path.getPathCount() > 1)) {
@@ -1021,8 +1019,10 @@ public class MainForm implements IAccountListener, IPostListener {
 			if (account.getBlogs().size() > 0) {
 				// create new path by adding first child to the end of the path
 				TreePath newPath = path.pathByAddingChild(account.getBlogs()
-						.toArray()[0]);
+						.iterator().next());
 				treeBlogs.setSelectionPath(newPath);
+				
+				updatePostActions(false, true);
 			}
 		}
 	}
