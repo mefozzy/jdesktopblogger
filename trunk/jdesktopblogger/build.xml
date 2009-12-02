@@ -15,7 +15,8 @@
 	<property name="VERSION" value="${major.version.number}.${minor.version.number}.${build.number}" />
 	<property name="SPEC_VERSION" value="${major.version.number}.${minor.version.number}" />
 	<property name="build" value="bin" />
-	<property name="jarFile" value="${build}/jar/startup.jar" />
+	<property name="appName" value="jdesktopblogger" />
+	<property name="jarFile" value="${build}/jar/${appName}.jar" />
 	<property name="jarTmp" value="${build}/tmp.jar" />
 	<property name="manifest" value="${build}/MANIFEST.MF" />
 
