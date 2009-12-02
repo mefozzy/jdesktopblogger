@@ -18,8 +18,7 @@ public class AccountDeleteAction extends SuperAction {
 	public AccountDeleteAction(MainForm fr) {
 		this("Delete Acount",
 				MainForm.createImageIcon("images/editdelete.png"), //$NON-NLS-1$
-				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
-						ActionEvent.ALT_MASK),
+				KeyEvent.VK_D, null,
 				"Delete account from the application", fr);
 		
 		setEnabled(false);
