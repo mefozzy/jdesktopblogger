@@ -58,7 +58,9 @@ import ua.jdesktopblogger.domain.IPostListener;
 import ua.jdesktopblogger.domain.Post;
 import ua.jdesktopblogger.excetions.AccountIOException;
 import ua.jdesktopblogger.services.ServiceFactory;
+import ua.jdesktopblogger.ui.actions.AccountDeleteAction;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
+import ua.jdesktopblogger.ui.actions.AccountNewAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
 import ua.jdesktopblogger.ui.actions.PostDeleteAction;
 import ua.jdesktopblogger.ui.actions.PostEditAction;
@@ -125,14 +127,16 @@ public class MainForm implements IAccountListener, IPostListener {
 	private JPanel panelInfoPost;
 	// //////////////////////////////////////////////////////////////////////////////////
 
+	private AccountNewAction accountNewAction;
 	private AccountEditAction accountEditAction;
+	private AccountDeleteAction accountDeleteAction;
 	private AccountRefreshAction accountRefreshAction;
 	private PostsLoadAction postsLoadAction;
-	
+
 	private PostEditAction postEditAction;
 	private PostNewAction postNewAction;
 	private PostDeleteAction postDeleteAction;
-	
+
 	private ViewShowHideAppAction viewShowHideAppAction;
 
 	/**
@@ -235,13 +239,13 @@ public class MainForm implements IAccountListener, IPostListener {
 	private void loadSystemTray() {
 		if (SystemTray.isSupported()) {
 			SystemTray tray = SystemTray.getSystemTray();
-			trayIcon = new TrayIcon(
-					createImageIcon("images/jdesktopblogger24.png").getImage(), //$NON-NLS-1$ 
+			trayIcon = new TrayIcon(createImageIcon(
+					"images/jdesktopblogger24.png").getImage(), //$NON-NLS-1$ 
 					appTitle);
 
-			trayIcon.setPopupMenu(PopupFactory.getGeneralPopupAwt(
-					viewShowHideAppAction));
-			//, null, emailCheckAllAction,
+			trayIcon.setPopupMenu(PopupFactory
+					.getGeneralPopupAwt(viewShowHideAppAction));
+			// , null, emailCheckAllAction,
 			// null, helpAboutAction, fileExitAction));
 
 			trayIcon.setImageAutoSize(true);
@@ -301,16 +305,23 @@ public class MainForm implements IAccountListener, IPostListener {
 		try {
 			Collection<Account> accounts = ServiceFactory.getDefaultFactory()
 					.getAccountService().loadSavedAccounts();
-			
+
 			treeModelBlogs.removeAllAccounts();
 
 			for (Account account : accounts) {
 				treeModelBlogs.addAccount(account);
-				treeBlogs.updateUI();
-
-				// Enabling actions
-				accountRefreshAction.setEnabled(true);
 			}
+			
+			// Selecting first account if exists
+			if (accounts.size() > 0) {
+				TreePath path = new TreePath(treeBlogs.getModel().getRoot());
+				path = path.pathByAddingChild(accounts.iterator().next());
+				treeBlogs.setSelectionPath(path);
+				
+				updateAccountActions(true);
+			}
+			
+			treeBlogs.updateUI();
 
 		} catch (AccountIOException e) {
 			e.printStackTrace();
@@ -363,7 +374,9 @@ public class MainForm implements IAccountListener, IPostListener {
 	 *            Frame
 	 */
 	private void createActions(JFrame fr) {
+		accountNewAction = new AccountNewAction(this);
 		accountEditAction = new AccountEditAction(this);
+		accountDeleteAction = new AccountDeleteAction(this);
 		accountRefreshAction = new AccountRefreshAction(this);
 
 		postsLoadAction = new PostsLoadAction(this);
@@ -371,7 +384,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		postNewAction = new PostNewAction(this);
 		postDeleteAction = new PostDeleteAction(this);
 		postEditAction = new PostEditAction(this);
-		
+
 		viewShowHideAppAction = new ViewShowHideAppAction(this);
 		// helpAboutAction = new HelpAboutAction(this);
 	}
@@ -426,9 +439,12 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		createToolBar(contentPane);
 	}
+
 	/**
 	 * create tree for list of blogs and added listener to it
-	 * @param scrollPane - scroll pane to add jTree
+	 * 
+	 * @param scrollPane
+	 *            - scroll pane to add jTree
 	 */
 	private void createBlogsTable(JScrollPane scrollPane) {
 		tablePostModel = new TablePostModel(this);
@@ -447,7 +463,7 @@ public class MainForm implements IAccountListener, IPostListener {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					updatePostInfoPanel();
-					updatePostActions(true);
+					updatePostActions(true, true);
 				}
 			}
 		});
@@ -518,32 +534,40 @@ public class MainForm implements IAccountListener, IPostListener {
 		toolBar.setFloatable(true);
 		contentPane.add(toolBar, BorderLayout.NORTH);
 
+		button = new JButton(accountNewAction);
+		button.setText(null);
+		toolBar.add(button);
+
 		button = new JButton(accountEditAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
+		button = new JButton(accountDeleteAction);
+		button.setText(null);
+		toolBar.add(button);
+
 		toolBar.addSeparator();
 
 		button = new JButton(accountRefreshAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		toolBar.addSeparator();
 
 		button = new JButton(postsLoadAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		toolBar.addSeparator();
 
 		button = new JButton(postNewAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		button = new JButton(postEditAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		button = new JButton(postDeleteAction);
 		button.setText(null);
 		toolBar.add(button);
@@ -576,8 +600,9 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		return panelStatusBar;
 	}
+
 	/**
-	 * creating text pane for post content outputting and panel with detailed 
+	 * creating text pane for post content outputting and panel with detailed
 	 * post information
 	 * 
 	 * @return created area
@@ -594,7 +619,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		// edit)
 		JPanel panelForPostDates = new JPanel(new FlowLayout());
 		createDatesInfoPanel(panelForPostDates);
-		panelInfoPost.add(panelForPostDates, BorderLayout.WEST);		
+		panelInfoPost.add(panelForPostDates, BorderLayout.WEST);
 		panelInfoPost.setVisible(false);
 
 		MouseListener popupListener = new PopupListener(PopupFactory
@@ -614,9 +639,12 @@ public class MainForm implements IAccountListener, IPostListener {
 		panel.add(areaLogScrollPane, BorderLayout.CENTER);
 		return panel;
 	}
+
 	/**
 	 * creating text pane for post content
-	 * @param popupListener - popup listener for text pane
+	 * 
+	 * @param popupListener
+	 *            - popup listener for text pane
 	 * @return - scroll pane with all components
 	 */
 	private JScrollPane createTextPanePostPanel(MouseListener popupListener) {
@@ -645,9 +673,12 @@ public class MainForm implements IAccountListener, IPostListener {
 		textPanePost.addKeyListener(keyListener);
 		return areaLogScrollPane;
 	}
+
 	/**
 	 * creating panel for information about post dates (publish and edit)
-	 * @param panelForPostDates - panel to fill with components
+	 * 
+	 * @param panelForPostDates
+	 *            - panel to fill with components
 	 */
 	private void createDatesInfoPanel(JPanel panelForPostDates) {
 		labelPostDateEdit = new JLabel();
@@ -657,9 +688,12 @@ public class MainForm implements IAccountListener, IPostListener {
 		labelPostDatePublish = new JLabel();
 		panelForPostDates.add(labelPostDatePublish);
 	}
+
 	/**
 	 * creating panel for information about URL of the post
-	 * @param panelForUrl - panel to add components
+	 * 
+	 * @param panelForUrl
+	 *            - panel to add components
 	 */
 	private void createURLInfoPanel(JPanel panelForUrl) {
 		panelForUrl.add(new JLabel("Url of the post:"));
@@ -669,20 +703,24 @@ public class MainForm implements IAccountListener, IPostListener {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
 					Post post = MainForm.this.getSelectedPost();
-					if (post != null){
-						if( !java.awt.Desktop.isDesktopSupported() ) {
+					if (post != null) {
+						if (!java.awt.Desktop.isDesktopSupported()) {
 
-				            System.err.println( "Desktop is not supported (fatal)" );
-				            System.exit( 1 );
-				        }
-						java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-						if( !desktop.isSupported( java.awt.Desktop.Action.BROWSE ) ) {
+							System.err
+									.println("Desktop is not supported (fatal)");
+							System.exit(1);
+						}
+						java.awt.Desktop desktop = java.awt.Desktop
+								.getDesktop();
+						if (!desktop
+								.isSupported(java.awt.Desktop.Action.BROWSE)) {
 
-				            System.err.println( "Desktop doesn't support the browse action (fatal)" );
-				            return;
-				        }
+							System.err
+									.println("Desktop doesn't support the browse action (fatal)");
+							return;
+						}
 						try {
-							desktop.browse( new URI(post.getUrl()));
+							desktop.browse(new URI(post.getUrl()));
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -721,10 +759,24 @@ public class MainForm implements IAccountListener, IPostListener {
 		treeBlogs.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					tablePostModel.fireTableDataChanged();
-					updatePostInfoPanel();
 					
-					updatePostActions(false);
+					TreePath path = treeBlogs.getSelectionPath();
+					if (path.getPath().length <= 1) {
+						// root is selected
+						updateAccountActions(false);
+						updatePostActions(false, false);
+					} else if (path.getPath().length == 2) {
+						// Account is selected
+						updateAccountActions(true);
+						updatePostActions(false, false);
+					} else {
+						// Blog is selected
+						tablePostModel.fireTableDataChanged();
+						updatePostInfoPanel();
+
+						updateAccountActions(true);
+						updatePostActions(false, true);
+					}
 				}
 			}
 		});
@@ -842,6 +894,8 @@ public class MainForm implements IAccountListener, IPostListener {
 		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
 		path = path.pathByAddingChild(account);
 		treeBlogs.setSelectionPath(path);
+		updateAccountActions(true);
+		updatePostActions(false, false);
 	}
 
 	/*
@@ -853,7 +907,39 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	@Override
 	public void accountEdited(Account account) {
+		loadSavedAccounts();
+		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
+		path = path.pathByAddingChild(account);
+		treeBlogs.setSelectionPath(path);
+		updateAccountActions(true);
+		updatePostActions(false, false);
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.domain.IAccountListener#accountDeleted(ua.jdesktopblogger
+	 * .domain.Account)
+	 */
+	@Override
+	public void accountDeleted(Account account) {
+		loadSavedAccounts();
+		
+		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
+		if (treeModelBlogs.getSize() > 0) {
+			path = path.pathByAddingChild(treeBlogs.getModel().getChild(
+					treeBlogs.getModel().getRoot(), 0));
+			updateAccountActions(true);
+		} else {
+			updateAccountActions(false);
+		}
+		treeBlogs.setSelectionPath(path);
+		
+		tablePostModel.fireTableDataChanged();
+		updatePostInfoPanel();
+		
+		updatePostActions(false, false);
 	}
 
 	/*
@@ -905,7 +991,8 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	public Post getSelectedPost() {
 		int iSelPost = tablePosts.getSelectedRow();
-		if (iSelPost == -1) return null;
+		if (iSelPost == -1)
+			return null;
 		return (Post) tablePosts.getModel().getValueAt(iSelPost,
 				TablePostModel.POST_COLUMN_WHOLE_POST);
 	}
@@ -953,8 +1040,12 @@ public class MainForm implements IAccountListener, IPostListener {
 		updatePostInfoPanel();
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.domain.IPostListener#postUpdated(ua.jdesktopblogger.domain.Blog, ua.jdesktopblogger.domain.Post)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.domain.IPostListener#postUpdated(ua.jdesktopblogger
+	 * .domain.Blog, ua.jdesktopblogger.domain.Post)
 	 */
 	@Override
 	public void postUpdated(Blog blog, Post publishedPost) {
@@ -962,14 +1053,19 @@ public class MainForm implements IAccountListener, IPostListener {
 		updatePostInfoPanel();
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.domain.IPostListener#postDeleted(ua.jdesktopblogger.domain.Blog)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.domain.IPostListener#postDeleted(ua.jdesktopblogger
+	 * .domain.Blog)
 	 */
 	@Override
 	public void postDeleted(Blog blog) {
-		tablePostModel.fireTableDataChanged();	
+		tablePostModel.fireTableDataChanged();
 		updatePostInfoPanel();
 	}
+
 	/**
 	 * update information about selected post
 	 */
@@ -980,33 +1076,48 @@ public class MainForm implements IAccountListener, IPostListener {
 		if (post == null) {
 			panelInfoPost.setVisible(false);
 			textPanePost.setText("");
-			
-			updatePostActions(false);
-			return ;
+
+			updatePostActions(false, true);
+			return;
 		}
 		textPanePost.setText(post.getBody());
 		textPanePost.setCaretPosition(0);
 		labelPostName.setText(post.getTitle());
 
 		// format dates of the post
-		DateFormat df = DateFormat.getDateTimeInstance(
-				DateFormat.MEDIUM, DateFormat.SHORT);
+		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
+				DateFormat.SHORT);
 
-		labelPostDateEdit.setText(df.format(post
-				.getPublishDate().getTime()));
-		labelPostDatePublish.setText(df.format(post
-				.getEditDate().getTime()));
-		labelPostUrl.setText("<html><a href=\""
-				+ post.getUrl() + "\">" + post.getUrl()
-				+ "</a></html>");
+		labelPostDateEdit.setText(df.format(post.getPublishDate().getTime()));
+		labelPostDatePublish.setText(df.format(post.getEditDate().getTime()));
+		labelPostUrl.setText("<html><a href=\"" + post.getUrl() + "\">"
+				+ post.getUrl() + "</a></html>");
 
 		// show the panel with post's information
 		panelInfoPost.setVisible(true);
 	}
 
-	private void updatePostActions(boolean enabled) {
+	/**
+	 * Updating all actions that relate to the post
+	 * @param enabled Specify if actions should be enabled or disabled
+	 * @param enabledBlogRelated Specify if actions related to the whole blog should be enabled
+	 */
+	private void updatePostActions(boolean enabled, boolean enabledBlogRelated) {
 		postDeleteAction.setEnabled(enabled);
 		postEditAction.setEnabled(enabled);
+		
+		postNewAction.setEnabled(enabledBlogRelated);
+		postsLoadAction.setEnabled(enabledBlogRelated);
+	}
+	
+	/**
+	 * Updating all actions that relate to the account
+	 * @param enabled Specify if actions should be enabled or disabled
+	 */
+	private void updateAccountActions(boolean enabled) {
+		accountEditAction.setEnabled(enabled);
+		accountDeleteAction.setEnabled(enabled);
+		accountRefreshAction.setEnabled(enabled);
 	}
 
 }
