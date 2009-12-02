@@ -77,8 +77,12 @@ public class AccountServiceImpl implements IAccountService {
 		return sb;
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.services.IAccountService#saveAccount(ua.jdesktopblogger.domain.Account)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.services.IAccountService#saveAccount(ua.jdesktopblogger
+	 * .domain.Account)
 	 */
 	@Override
 	public void saveAccount(Account account) throws AccountIOException {
@@ -121,33 +125,42 @@ public class AccountServiceImpl implements IAccountService {
 		return jc;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see ua.jdesktopblogger.services.IAccountService#loadSavedAccounts()
 	 */
 	@Override
 	public Collection<Account> loadSavedAccounts() throws AccountIOException {
 		StringBuffer dirName = buildSettingsDir();
 		File dir = new File(dirName.toString());
-		
 		Collection<Account> rez = new ArrayList<Account>();
-		
-		for (File file : dir.listFiles()) {
-			if ((!file.isDirectory()) && (file.canRead())) {
-				try {
-					Account account = loadAccountFromFile(file.getAbsolutePath());
-					
-					rez.add(account);
-				} catch (Exception e) {
-					System.err.println("Failed to load account from " + file.getAbsolutePath() + " >>> " + e);
+		if ((dir.exists()) || (dir.mkdirs())) {
+
+			for (File file : dir.listFiles()) {
+				if ((!file.isDirectory()) && (file.canRead())) {
+					try {
+						Account account = loadAccountFromFile(file
+								.getAbsolutePath());
+
+						rez.add(account);
+					} catch (Exception e) {
+						System.err.println("Failed to load account from "
+								+ file.getAbsolutePath() + " >>> " + e);
+					}
 				}
 			}
 		}
-		
+
 		return rez;
 	}
 
-	/* (non-Javadoc)
-	 * @see ua.jdesktopblogger.services.IAccountService#deleteAccount(ua.jdesktopblogger.domain.Account)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ua.jdesktopblogger.services.IAccountService#deleteAccount(ua.jdesktopblogger
+	 * .domain.Account)
 	 */
 	@Override
 	public void deleteAccount(Account account) throws AccountIOException {
