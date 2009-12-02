@@ -21,6 +21,8 @@ public class AccountDeleteAction extends SuperAction {
 				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
 						ActionEvent.ALT_MASK),
 				"Delete account from the application", fr);
+		
+		setEnabled(false);
 	}
 
 	public AccountDeleteAction(String caption, ImageIcon icon, int keyEvent,

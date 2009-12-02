@@ -20,6 +20,8 @@ public class AccountEditAction extends SuperAction {
 				KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E,
 						ActionEvent.ALT_MASK),
 				"Edit account information, such as login and password", fr);
+		
+		setEnabled(false);
 	}
 
 	public AccountEditAction(String caption, ImageIcon icon, int keyEvent,
