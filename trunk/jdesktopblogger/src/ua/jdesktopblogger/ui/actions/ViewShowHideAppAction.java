@@ -4,6 +4,7 @@ import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
@@ -40,13 +41,13 @@ public class ViewShowHideAppAction extends SuperAction implements IAwtMenuItemAc
 		
 		if (form.getFrame().isVisible()) {
 			form.getFrame().setVisible(false);
-			putValue(NAME, SHOW_NAME);
+			putValue(Action.NAME, SHOW_NAME);
 			putValue(SHORT_DESCRIPTION, SHOW_DESC);
 			putValue(SMALL_ICON, SHOW_ICON);
 			menuItem.setLabel(SHOW_NAME);
 		} else {
 			form.getFrame().setVisible(true);
-			putValue(NAME, HIDE_NAME);
+			putValue(Action.NAME, HIDE_NAME);
 			putValue(SHORT_DESCRIPTION, HIDE_DESC);
 			putValue(SMALL_ICON, HIDE_ICON);
 			menuItem.setLabel(HIDE_NAME);
