@@ -568,6 +568,11 @@ public class MainForm implements IAccountListener, IPostListener {
 		menuItem = new JMenuItem(accountRefreshAction);
 		menu.add(menuItem);
 		
+		menu.addSeparator();
+		
+		menuItem = new JMenuItem(fileExitAction);
+		menu.add(menuItem);
+		
 		// ================================================
 		// POST MENU
 
