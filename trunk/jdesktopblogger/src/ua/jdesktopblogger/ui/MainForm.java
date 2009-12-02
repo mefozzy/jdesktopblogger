@@ -105,9 +105,9 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private JToolBar toolBar;
 
-	//private JProgressBar progressBar;
+	// private JProgressBar progressBar;
 
-	//private JButton cancelButton;
+	// private JButton cancelButton;
 
 	private JLabel labelStatusBar;
 
@@ -143,7 +143,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	private PostDeleteAction postDeleteAction;
 
 	private ViewShowHideAppAction viewShowHideAppAction;
-	
+
 	private FileExitAction fileExitAction;
 	private HelpAboutAction helpAboutAction;
 
@@ -251,9 +251,9 @@ public class MainForm implements IAccountListener, IPostListener {
 					"images/jdesktopblogger24.png").getImage(), //$NON-NLS-1$ 
 					appTitle);
 
-			trayIcon.setPopupMenu(PopupFactory
-					.getGeneralPopupAwt(viewShowHideAppAction
-			, null, helpAboutAction, fileExitAction));
+			trayIcon.setPopupMenu(PopupFactory.getGeneralPopupAwt(
+					viewShowHideAppAction, null, helpAboutAction,
+					fileExitAction));
 
 			trayIcon.setImageAutoSize(true);
 
@@ -318,16 +318,16 @@ public class MainForm implements IAccountListener, IPostListener {
 			for (Account account : accounts) {
 				treeModelBlogs.addAccount(account);
 			}
-			
+
 			// Selecting first account if exists
 			if (accounts.size() > 0) {
 				TreePath path = new TreePath(treeBlogs.getModel().getRoot());
 				path = path.pathByAddingChild(accounts.iterator().next());
 				treeBlogs.setSelectionPath(path);
-				
+
 				updateAccountActions(true);
 			}
-			
+
 			treeBlogs.updateUI();
 
 		} catch (AccountIOException e) {
@@ -382,7 +382,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	private void createActions(JFrame fr) {
 		fileExitAction = new FileExitAction(this);
-		
+
 		accountNewAction = new AccountNewAction(this);
 		accountEditAction = new AccountEditAction(this);
 		accountDeleteAction = new AccountDeleteAction(this);
@@ -529,7 +529,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setCellRenderer(datePublishRenderer);
 
 	}
-	
+
 	/**
 	 * Creating menus
 	 * 
@@ -542,7 +542,7 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		// Create the menu bar.
 		menuBar = new JMenuBar();
-		
+
 		fr.setJMenuBar(menuBar);
 
 		// ================================================
@@ -562,27 +562,27 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		menuItem = new JMenuItem(accountDeleteAction);
 		menu.add(menuItem);
-		
+
 		menu.addSeparator();
-		
+
 		menuItem = new JMenuItem(accountRefreshAction);
 		menu.add(menuItem);
-		
+
 		menu.addSeparator();
-		
+
 		menuItem = new JMenuItem(fileExitAction);
 		menu.add(menuItem);
-		
+
 		// ================================================
 		// POST MENU
 
 		menu = new JMenu("Blog");
 		menu.setMnemonic(KeyEvent.VK_B);
 		menuBar.add(menu);
-		
+
 		menuItem = new JMenuItem(postsLoadAction);
 		menu.add(menuItem);
-		
+
 		menu.addSeparator();
 
 		menuItem = new JMenuItem(postNewAction);
@@ -595,7 +595,7 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		menuItem = new JMenuItem(postDeleteAction);
 		menu.add(menuItem);
-		
+
 		// ===============================================
 		// Help MENU
 
@@ -657,9 +657,9 @@ public class MainForm implements IAccountListener, IPostListener {
 		button = new JButton(postDeleteAction);
 		button.setText(null);
 		toolBar.add(button);
-		
+
 		toolBar.add(Box.createHorizontalGlue());
-		
+
 		button = new JButton(viewShowHideAppAction);
 		toolBar.add(button);
 	}
@@ -850,23 +850,25 @@ public class MainForm implements IAccountListener, IPostListener {
 		treeBlogs.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
-					
-					TreePath path = treeBlogs.getSelectionPath();
-					if (path.getPath().length <= 1) {
-						// root is selected
-						updateAccountActions(false);
-						updatePostActions(false, false);
-					} else if (path.getPath().length == 2) {
-						// Account is selected
-						updateAccountActions(true);
-						updatePostActions(false, false);
-					} else {
-						// Blog is selected
-						tablePostModel.fireTableDataChanged();
-						updatePostInfoPanel();
 
-						updateAccountActions(true);
-						updatePostActions(false, true);
+					TreePath path = treeBlogs.getSelectionPath();
+					if (path != null) {
+						if (path.getPath().length <= 1) {
+							// root is selected
+							updateAccountActions(false);
+							updatePostActions(false, false);
+						} else if (path.getPath().length == 2) {
+							// Account is selected
+							updateAccountActions(true);
+							updatePostActions(false, false);
+						} else {
+							// Blog is selected
+							tablePostModel.fireTableDataChanged();
+							updatePostInfoPanel();
+
+							updateAccountActions(true);
+							updatePostActions(false, true);
+						}
 					}
 				}
 			}
@@ -982,13 +984,14 @@ public class MainForm implements IAccountListener, IPostListener {
 	@Override
 	public void accountCreated(Account account) {
 		loadSavedAccounts();
-		
-		Account addedAccount = treeModelBlogs.getAccountByLogin(account.getLogin());
-		
+
+		Account addedAccount = treeModelBlogs.getAccountByLogin(account
+				.getLogin());
+
 		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
 		path = path.pathByAddingChild(addedAccount);
 		treeBlogs.setSelectionPath(path);
-		
+
 		updateAccountActions(true);
 		updatePostActions(false, false);
 	}
@@ -1015,7 +1018,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	@Override
 	public void accountDeleted(Account account) {
 		loadSavedAccounts();
-		
+
 		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
 		if (treeModelBlogs.getSize() > 0) {
 			path = path.pathByAddingChild(treeBlogs.getModel().getChild(
@@ -1025,10 +1028,10 @@ public class MainForm implements IAccountListener, IPostListener {
 			updateAccountActions(false);
 		}
 		treeBlogs.setSelectionPath(path);
-		
+
 		tablePostModel.fireTableDataChanged();
 		updatePostInfoPanel();
-		
+
 		updatePostActions(false, false);
 	}
 
@@ -1039,7 +1042,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 * jdesktopblogger.domain.Account)
 	 */
 	@Override
-	public void accountRefreshed(Account account) {		
+	public void accountRefreshed(Account account) {
 		selectFirstBlogOfSelectedAccount();
 		treeBlogs.updateUI();
 	}
@@ -1111,7 +1114,7 @@ public class MainForm implements IAccountListener, IPostListener {
 				TreePath newPath = path.pathByAddingChild(account.getBlogs()
 						.iterator().next());
 				treeBlogs.setSelectionPath(newPath);
-				
+
 				updatePostActions(false, true);
 			}
 		}
@@ -1189,20 +1192,25 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	/**
 	 * Updating all actions that relate to the post
-	 * @param enabled Specify if actions should be enabled or disabled
-	 * @param enabledBlogRelated Specify if actions related to the whole blog should be enabled
+	 * 
+	 * @param enabled
+	 *            Specify if actions should be enabled or disabled
+	 * @param enabledBlogRelated
+	 *            Specify if actions related to the whole blog should be enabled
 	 */
 	private void updatePostActions(boolean enabled, boolean enabledBlogRelated) {
 		postDeleteAction.setEnabled(enabled);
 		postEditAction.setEnabled(enabled);
-		
+
 		postNewAction.setEnabled(enabledBlogRelated);
 		postsLoadAction.setEnabled(enabledBlogRelated);
 	}
-	
+
 	/**
 	 * Updating all actions that relate to the account
-	 * @param enabled Specify if actions should be enabled or disabled
+	 * 
+	 * @param enabled
+	 *            Specify if actions should be enabled or disabled
 	 */
 	private void updateAccountActions(boolean enabled) {
 		accountEditAction.setEnabled(enabled);
