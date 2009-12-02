@@ -98,4 +98,13 @@ public class BlogsTreeDataModel extends TreeModelSupport implements TreeModel{
 		accountsList.clear();
 	}
 	
+	public Account getAccountByLogin(String login) {
+		for (Account account : accountsList) {
+			if (account.getLogin().equals(login)) {
+				return account;
+			}
+		}
+		return null;
+	}
+	
 }
