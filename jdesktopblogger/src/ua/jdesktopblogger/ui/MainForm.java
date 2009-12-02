@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -26,14 +27,16 @@ import java.util.Calendar;
 import java.util.Collection;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -62,6 +65,8 @@ import ua.jdesktopblogger.ui.actions.AccountDeleteAction;
 import ua.jdesktopblogger.ui.actions.AccountEditAction;
 import ua.jdesktopblogger.ui.actions.AccountNewAction;
 import ua.jdesktopblogger.ui.actions.AccountRefreshAction;
+import ua.jdesktopblogger.ui.actions.FileExitAction;
+import ua.jdesktopblogger.ui.actions.HelpAboutAction;
 import ua.jdesktopblogger.ui.actions.PostDeleteAction;
 import ua.jdesktopblogger.ui.actions.PostEditAction;
 import ua.jdesktopblogger.ui.actions.PostNewAction;
@@ -100,9 +105,9 @@ public class MainForm implements IAccountListener, IPostListener {
 
 	private JToolBar toolBar;
 
-	private JProgressBar progressBar;
+	//private JProgressBar progressBar;
 
-	private JButton cancelButton;
+	//private JButton cancelButton;
 
 	private JLabel labelStatusBar;
 
@@ -138,6 +143,9 @@ public class MainForm implements IAccountListener, IPostListener {
 	private PostDeleteAction postDeleteAction;
 
 	private ViewShowHideAppAction viewShowHideAppAction;
+	
+	private FileExitAction fileExitAction;
+	private HelpAboutAction helpAboutAction;
 
 	/**
 	 * Create the class and frame
@@ -209,7 +217,7 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		createComponents(frame.getContentPane());
 
-		// createMenu(frame);
+		createMenu(frame);
 		//		
 		// setToggleMenusAndButtons(null);
 
@@ -244,9 +252,8 @@ public class MainForm implements IAccountListener, IPostListener {
 					appTitle);
 
 			trayIcon.setPopupMenu(PopupFactory
-					.getGeneralPopupAwt(viewShowHideAppAction));
-			// , null, emailCheckAllAction,
-			// null, helpAboutAction, fileExitAction));
+					.getGeneralPopupAwt(viewShowHideAppAction
+			, null, helpAboutAction, fileExitAction));
 
 			trayIcon.setImageAutoSize(true);
 
@@ -374,6 +381,8 @@ public class MainForm implements IAccountListener, IPostListener {
 	 *            Frame
 	 */
 	private void createActions(JFrame fr) {
+		fileExitAction = new FileExitAction(this);
+		
 		accountNewAction = new AccountNewAction(this);
 		accountEditAction = new AccountEditAction(this);
 		accountDeleteAction = new AccountDeleteAction(this);
@@ -386,7 +395,7 @@ public class MainForm implements IAccountListener, IPostListener {
 		postEditAction = new PostEditAction(this);
 
 		viewShowHideAppAction = new ViewShowHideAppAction(this);
-		// helpAboutAction = new HelpAboutAction(this);
+		helpAboutAction = new HelpAboutAction(this);
 	}
 
 	/**
@@ -520,6 +529,78 @@ public class MainForm implements IAccountListener, IPostListener {
 		col.setCellRenderer(datePublishRenderer);
 
 	}
+	
+	/**
+	 * Creating menus
+	 * 
+	 * @param fr
+	 *            Frame
+	 */
+	private void createMenu(JFrame fr) {
+		JMenu menu;
+		JMenuItem menuItem;
+
+		// Create the menu bar.
+		menuBar = new JMenuBar();
+		
+		fr.setJMenuBar(menuBar);
+
+		// ================================================
+		// ACCOUNT MENU
+
+		menu = new JMenu("Account");
+		menu.setMnemonic(KeyEvent.VK_A);
+		menuBar.add(menu);
+
+		menuItem = new JMenuItem(accountNewAction);
+		menu.add(menuItem);
+
+		menuItem = new JMenuItem(accountEditAction);
+		menu.add(menuItem);
+
+		menu.addSeparator();
+
+		menuItem = new JMenuItem(accountDeleteAction);
+		menu.add(menuItem);
+		
+		menu.addSeparator();
+		
+		menuItem = new JMenuItem(accountRefreshAction);
+		menu.add(menuItem);
+		
+		// ================================================
+		// POST MENU
+
+		menu = new JMenu("Blog");
+		menu.setMnemonic(KeyEvent.VK_B);
+		menuBar.add(menu);
+		
+		menuItem = new JMenuItem(postsLoadAction);
+		menu.add(menuItem);
+		
+		menu.addSeparator();
+
+		menuItem = new JMenuItem(postNewAction);
+		menu.add(menuItem);
+
+		menuItem = new JMenuItem(postEditAction);
+		menu.add(menuItem);
+
+		menu.addSeparator();
+
+		menuItem = new JMenuItem(postDeleteAction);
+		menu.add(menuItem);
+		
+		// ===============================================
+		// Help MENU
+
+		menu = new JMenu("Help");
+		menu.setMnemonic(KeyEvent.VK_H);
+		menuBar.add(menu);
+
+		menuItem = new JMenuItem(helpAboutAction);
+		menu.add(menuItem);
+	}
 
 	/**
 	 * Creating toolbar
@@ -570,6 +651,11 @@ public class MainForm implements IAccountListener, IPostListener {
 
 		button = new JButton(postDeleteAction);
 		button.setText(null);
+		toolBar.add(button);
+		
+		toolBar.add(Box.createHorizontalGlue());
+		
+		button = new JButton(viewShowHideAppAction);
 		toolBar.add(button);
 	}
 
@@ -891,9 +977,13 @@ public class MainForm implements IAccountListener, IPostListener {
 	@Override
 	public void accountCreated(Account account) {
 		loadSavedAccounts();
+		
+		Account addedAccount = treeModelBlogs.getAccountByLogin(account.getLogin());
+		
 		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
-		path = path.pathByAddingChild(account);
+		path = path.pathByAddingChild(addedAccount);
 		treeBlogs.setSelectionPath(path);
+		
 		updateAccountActions(true);
 		updatePostActions(false, false);
 	}
@@ -907,12 +997,7 @@ public class MainForm implements IAccountListener, IPostListener {
 	 */
 	@Override
 	public void accountEdited(Account account) {
-		loadSavedAccounts();
-		TreePath path = new TreePath(treeBlogs.getModel().getRoot());
-		path = path.pathByAddingChild(account);
-		treeBlogs.setSelectionPath(path);
-		updateAccountActions(true);
-		updatePostActions(false, false);
+		accountCreated(account);
 	}
 
 	/*
