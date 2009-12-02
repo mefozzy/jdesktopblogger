@@ -43,6 +43,8 @@ public class AccountDeleteAction extends SuperAction {
 				
 				try {
 					ServiceFactory.getDefaultFactory().getAccountService().deleteAccount(account);
+					
+					form.accountDeleted(account);
 				} catch (Exception e) {
 					e.printStackTrace();
 					JOptionPane.showMessageDialog(form.getFrame(),
