@@ -1,13 +1,6 @@
 <?xml version="1.0"?>
 <project name="JDesktopBlogger" default="main" basedir=".">
 
-	<property name="fjepPath" value="lib/fatjar.jar" />
-	<taskdef name="fatjar.build" classname="net.sf.fjep.anttask.FJBuildTask" classpath="${fjepPath}" />
-	<typedef name="fatjar.manifest" classname="net.sf.fjep.anttask.FJManifestType" classpath="${fjepPath}" />
-	<typedef name="fatjar.exclude" classname="net.sf.fjep.anttask.FJExcludeType" classpath="${fjepPath}" />
-	<typedef name="fatjar.jarsource" classname="net.sf.fjep.anttask.FJJarSourceType" classpath="${fjepPath}" />
-	<typedef name="fatjar.filesource" classname="net.sf.fjep.anttask.FJFileSourceType" classpath="${fjepPath}" />
-
 	<buildnumber file="src/ua/jdesktopblogger/build_number.properties" />
 	<loadproperties srcFile="src/ua/jdesktopblogger/build_number.properties" />
 	<tstamp />
@@ -15,10 +8,10 @@
 	<property name="VERSION" value="${major.version.number}.${minor.version.number}.${build.number}" />
 	<property name="SPEC_VERSION" value="${major.version.number}.${minor.version.number}" />
 	<property name="build" value="bin" />
+	<property name="dist" value="dist" />
 	<property name="appName" value="jdesktopblogger" />
-	<property name="jarFile" value="${build}/jar/${appName}.jar" />
-	<property name="jarTmp" value="${build}/tmp.jar" />
-	<property name="manifest" value="${build}/MANIFEST.MF" />
+	<property name="jarFile" value="${dist}/${appName}.jar" />
+	<property name="manifest" value="${dist}/MANIFEST.MF" />
 
 	<property environment="env" />
 
@@ -34,11 +27,12 @@
 
 	<target name="init">
 		<mkdir dir="${build}" />
-		<mkdir dir="${build}/jar" />
+		<mkdir dir="${dist}" />
 	</target>
 
 	<target name="clean">
 		<delete dir="${build}" />
+		<delete dir="${dist}" />
 	</target>
 
 	<target name="build" depends="init">
@@ -80,50 +74,24 @@
 	</target>
 
 	<target name="jar" depends="clean, build, create-manifest" description="Creating single main jar with only program files">
-		<jar destfile="${build}/main.jar" basedir="${build}" index="true" manifest="${manifest}" />
+		<jar destfile="${jarFile}" basedir="${build}" index="true" manifest="${manifest}" />
+		<delete file="${manifest}" />
 	</target>
 
 	<target name="main" depends="jar">
-		<echo message="Manual creation of FatJar's ${jarFile}" />
-
-		<fatjar.build onejar="true" output="${jarTmp}">
-		</fatjar.build>
-
-		<!-- Unpacking contents of jar file -->
-		<unjar src="${jarTmp}" dest="${build}/unjar" />
-
-		<!-- Copying files to the directories -->
-		<copy todir="${build}/unjar/main" file="${build}/main.jar" overwrite="true" />
-		<copy todir="${build}/unjar/lib">
+		
+		<copy file="COPYRIGHT" tofile="${dist}/license" overwrite="true" />
+		
+		<copy file="scripts/run_script" tofile="${dist}/${appName}.sh" overwrite="true" />
+		
+		<mkdir dir="${dist}/libs"/>
+		
+		<copy todir="${dist}/libs">
 			<fileset dir="lib">
 				<include name="**/*" />
 			</fileset>
-		</copy>
-
-		<delete file="${jarFile}" />
-		<!-- Creating new jar file with extended manifest -->
-		<jar destfile="${jarFile}" basedir="${build}/unjar" index="true" manifest="${build}/unjar/META-INF/MANIFEST.MF">
-			<manifest>
-				<attribute name="Built-By" value="Yuriy E. Tkach" />
-				<attribute name="Built-On" value="${TODAY}" />
-
-				<section name="JDesktopBlogger">
-					<attribute name="Specification-Title" value="JDesktopBlogger" />
-					<attribute name="Specification-Version" value="${SPEC_VERSION}" />
-					<attribute name="Specification-Vendor" value="Yuriy E. Tkach, Oleksandr M. Skosyr" />
-					<attribute name="Implementation-Title" value="jdesktopblogger-${VERSION}" />
-					<attribute name="Implementation-Version" value="${VERSION}" />
-					<attribute name="Implementation-Vendor" value="Yuriy E. Tkach, Oleksandr M. Skosyr" />
-				</section>
-			</manifest>
-		</jar>
-
-		<!-- Deleting unpacked directory and created manifest -->
-		<delete dir="${build}/unjar" />
-		<delete file="${manifest}" />
-		<delete file="${build}/tmp.jar" />
-		<delete file="${build}/main.jar" />
-
-		<echo message="Created ${jarFile} with version ${VERSION}" />
+		</copy>		
+		
+		<echo message="Distribution files located in ${dist}" />
 	</target>
 </project>
