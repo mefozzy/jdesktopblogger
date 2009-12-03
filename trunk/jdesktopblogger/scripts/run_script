@@ -1,0 +1,6 @@
+java -cp "./jdesktopblogger.jar:./libs/activation.jar:./libs/gdata-client-1.0.jar:./libs/jaxb-api.jar:./libs/sample-util.jar:\
+./libs/gdata-client-meta-1.0.jar:./libs/jaxb-impl.jar:./libs/servlet-api.jar:./libs/forms-1.2.1.jar:\
+./libs/gdata-core-1.0.jar:./libs/jsr173_1.0_api.jar:./libs/ua.cn.yet.common.ui.jar:\
+./libs/gdata-base-1.0.jar:./libs/gdata-media-1.0.jar:./libs/jsr305.jar:./libs/xercesImpl-2.8.1.jar:\
+./libs/gdata-blogger-2.0.jar:./libs/google-collect-1.0-rc1.jar:./libs/mail.jar:./libs/xml-apis-1.3.03.jar" \
+ua.jdesktopblogger.JDesktopBloggerApp
