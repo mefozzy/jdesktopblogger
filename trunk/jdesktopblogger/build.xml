@@ -82,6 +82,8 @@
 		
 		<copy file="COPYRIGHT" tofile="${dist}/license" overwrite="true" />
 		
+		<copy file="src/ua/jdesktopblogger/ui/images/jdesktopblogger.png" todir="${dist}" overwrite="true" />
+		
 		<copy file="scripts/run_script" tofile="${dist}/${appName}.sh" overwrite="true" />
 		
 		<mkdir dir="${dist}/libs"/>
